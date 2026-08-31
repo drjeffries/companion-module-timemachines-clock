@@ -679,5 +679,103 @@ export function getPresets() {
 		}
 	}
 
+	presets['toggleBlink'] = {
+		type: 'button',
+		category: 'Blink',
+		name: 'Toggle Blink',
+		style: {
+			style: 'text',
+			text: 'Toggle\\nBlink',
+			size: '14',
+			color: ColorWhite,
+			bgcolor: ColorBlack,
+		},
+		steps: [
+			{
+				down: [
+					{
+						actionId: 'toggleBlink',
+						options: {
+							mode: 'brightness',
+							rate: 500,
+							digit: 100,
+							dot: 100,
+							colorA: this.COLORTABLE[0].id,
+							colorB: this.COLORTABLE[1].id,
+						},
+					},
+				],
+				up: [],
+			},
+		],
+		feedbacks: [
+			{
+				feedbackId: 'blinkActive',
+				options: {},
+				style: {
+					color: ColorWhite,
+					bgcolor: ColorRed,
+				},
+			},
+		],
+	}
+
+	presets['quickBlink'] = {
+		type: 'button',
+		category: 'Blink',
+		name: 'Quick Blink',
+		style: {
+			style: 'text',
+			text: 'Quick\\nBlink',
+			size: '14',
+			color: ColorWhite,
+			bgcolor: ColorBlack,
+		},
+		steps: [
+			{
+				down: [
+					{
+						actionId: 'quickBlink',
+						options: {
+							mode: 'brightness',
+							rate: 200,
+							digit: 100,
+							dot: 100,
+							colorA: this.COLORTABLE[0].id,
+							colorB: this.COLORTABLE[1].id,
+							duration: 2000,
+						},
+					},
+				],
+				up: [],
+			},
+		],
+		feedbacks: [],
+	}
+
+	presets['stopBlink'] = {
+		type: 'button',
+		category: 'Blink',
+		name: 'Stop Blink',
+		style: {
+			style: 'text',
+			text: 'Stop\\nBlink',
+			size: '14',
+			color: ColorWhite,
+			bgcolor: ColorBlack,
+		},
+		steps: [
+			{
+				down: [
+					{
+						actionId: 'stopBlink',
+					},
+				],
+				up: [],
+			},
+		],
+		feedbacks: [],
+	}
+
 	return presets
 }

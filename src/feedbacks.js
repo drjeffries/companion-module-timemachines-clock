@@ -105,5 +105,19 @@ export function getFeedbacks() {
 		},
 	}
 
+	feedbacks.blinkActive = {
+		type: 'boolean',
+		name: 'Blink Active',
+		description: 'Indicate if the Blink toggle is currently running',
+		defaultStyle: {
+			color: foregroundColor,
+			bgcolor: backgroundColorRed,
+		},
+		options: [],
+		callback: () => {
+			return !!this.BLINK_INTERVAL
+		},
+	}
+
 	return feedbacks
 }
