@@ -30,6 +30,18 @@ class TimeMachinesInstance extends InstanceBase {
 			displayModeFriendly: '',
 			timerState: '',
 			timerStateFriendly: '',
+			timerSeconds: 0,
+			tenths: 0,
+			ip: '',
+			mac: '',
+			ntpSyncCount: 0,
+			downtimerAlarmEnabled: false,
+			downtimerAlarmDuration: 0,
+			digitFormat: 0,
+			digitFormatFriendly: '',
+			dayCount: 0,
+			wifiSignal: 0,
+			rawStatusHex: '',
 		}
 		this.COLORTABLE = [
 			{ id: 'red', label: 'Red', r: 255, g: 0, b: 0 },
@@ -229,10 +241,12 @@ class TimeMachinesInstance extends InstanceBase {
 		}
 
 		this.DEVICEINFO.model = model
+		this.DEVICEINFO.rawStatusHex = Buffer.from(bytes).toString('hex')
 
 		if (bytes[0] <= 3) {
 			//it's a POE, Wifi, or Dot Matrix model and uses the following bytes structure
-			let name = bytesToAscii(bytes.slice(23)).replace(/\\x00/g, '')
+			//byte 24 is where the device name starts (byte 23 is WiFi Signal Strength, handled below)
+			let name = bytesToAscii(bytes.slice(24)).replace(/\x00/g, '')
 			let firmware = bytes[11] + '.' + bytes[12]
 			let display =
 				bytes[15].toString().padStart(2, '0') +
@@ -249,6 +263,29 @@ class TimeMachinesInstance extends InstanceBase {
 			this.DEVICEINFO.firmware = firmware
 			this.DEVICEINFO.display = display
 			this.DEVICEINFO.timerSeconds = totalSeconds
+			this.DEVICEINFO.tenths = bytes[18]
+
+			this.DEVICEINFO.ip = Array.from(bytes.slice(1, 5)).join('.')
+			this.DEVICEINFO.mac = Array.from(bytes.slice(5, 11))
+				.map((b) => b.toString(16).padStart(2, '0'))
+				.join(':')
+
+			this.DEVICEINFO.ntpSyncCount = (bytes[13] << 8) | bytes[14]
+
+			this.DEVICEINFO.downtimerAlarmEnabled = (bytes[20] & 0x80) !== 0
+			this.DEVICEINFO.downtimerAlarmDuration = bytes[20] & 0x7f
+
+			let digitFormat = bytes[22] & 0x1f
+			this.DEVICEINFO.digitFormat = digitFormat
+			this.DEVICEINFO.digitFormatFriendly =
+				{ 0: '4/6 Digits', 1: '(D):H:M:S', 2: '(H):M:S.Tenths' }[digitFormat] || 'Unknown'
+
+			//per the Locator Protocol API, the day count spans byte 21 (low 8 bits) and the top 3 bits
+			//of byte 22 (high bits) - the doc's own wording for byte 21 is ambiguous, so verify against
+			//actual hardware if a multi-day countdown value here matters to you
+			this.DEVICEINFO.dayCount = (((bytes[22] >> 5) & 0x07) << 8) | bytes[21]
+
+			this.DEVICEINFO.wifiSignal = bytes[23] === 0 ? 0 : -bytes[23]
 
 			let modeBits = bytes[19].toString(2).padStart(8, '0')
 

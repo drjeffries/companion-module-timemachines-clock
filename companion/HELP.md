@@ -21,9 +21,20 @@ This module controls clocks from [TimeMachines](https://timemachinescorp.com).
 - Model
 - Unit Name
 - Firmware Version
+- IP Address
+- MAC Address
 - Current Display on Clock (Current Time or Remaining Time on Timer)
 - Display Mode (Time of Day, Count Up, Count Down)
 - Timer State
+- Timer Remaining (Seconds)
+- Tenths of a Second
+- Day Count
+- Digit Format
+- WiFi Signal Strength
+- NTP Sync Count
+- Downtimer Alarm Enabled
+- Downtimer Alarm Duration
+- Raw Status Packet (Hex) - the full status response from the clock, for anything not already broken out above
 
 ### Feedbacks
 
