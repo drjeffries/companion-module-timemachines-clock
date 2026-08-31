@@ -30,6 +30,7 @@ This module controls clocks from [TimeMachines](https://timemachinescorp.com).
 - Dispaly Mode (Time of Day, Count Up, Count Down)
 - Timer State (Count Up, Count Down) (Running, Stopped)
 - Remaining Seconds on Timer
+- Text Color Matches Display Color (reflects only colors set through this module - see note in feedbacks.js)
 
 ### Presets
 

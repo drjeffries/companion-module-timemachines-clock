@@ -41,6 +41,10 @@ class TimeMachinesInstance extends InstanceBase {
 			{ id: 'white', label: 'White', r: 255, g: 255, b: 255 },
 			{ id: 'custom', label: 'Custom RGB Value', r: 255, g: 255, b: 255 },
 		]
+		//the clock never reports its display color back to us, so this only reflects what this module
+		//itself last commanded - it will be wrong/stale if color is changed elsewhere (the clock's own
+		//web page, TM-Manager, another Companion connection, or an Alarm's "CX" color-change event)
+		this.LAST_COLOR = { color_mmss: 'white', color_hh: 'white', custom_hh: null, custom_mmss: null }
 
 		this.initConnection()
 
@@ -587,6 +591,18 @@ class TimeMachinesInstance extends InstanceBase {
 		hexstring = 'B6' + mmss_r_hex + mmss_g_hex + mmss_b_hex + hh_r_hex + hh_g_hex + hh_b_hex
 
 		this.udp.send(Buffer.from(hexstring, 'hex'))
+	}
+
+	setRestingColor(color_mmss, color_hh, custom_hh, custom_mmss) {
+		//the clock never reports its color back to us, so this is the only record available of what
+		//color it should currently be
+		this.LAST_COLOR = { color_mmss, color_hh, custom_hh, custom_mmss }
+		this.setDisplayColor(color_mmss, color_hh, custom_hh, custom_mmss)
+	}
+
+	resolveColorRGB(colorId, custom) {
+		let colorObj = colorId === 'custom' ? custom : this.COLORTABLE.find((CLR) => CLR.id == colorId)
+		return colorObj ? { r: colorObj.r, g: colorObj.g, b: colorObj.b } : { r: 255, g: 255, b: 255 }
 	}
 }
 runEntrypoint(TimeMachinesInstance, UpgradeScripts)

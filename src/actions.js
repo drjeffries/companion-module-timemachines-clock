@@ -538,7 +538,7 @@ export function getActions() {
 						b: opt.custom_mmss_b,
 					}
 				}
-				this.setDisplayColor(opt.color_mmss, opt.color_hh, custom_hh, custom_mmss)
+				this.setRestingColor(opt.color_mmss, opt.color_hh, custom_hh, custom_mmss)
 			},
 		},
 	}

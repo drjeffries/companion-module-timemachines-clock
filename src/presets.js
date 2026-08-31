@@ -679,5 +679,32 @@ export function getPresets() {
 		}
 	}
 
+	presets['displayValueMatchingColor'] = {
+		type: 'button',
+		category: 'Display Colors',
+		name: 'Display Value, Text Color Matches Display Color',
+		style: {
+			style: 'text',
+			text: '$(tm-clock:display)',
+			size: '14',
+			color: ColorWhite,
+			bgcolor: ColorBlack,
+		},
+		steps: [
+			{
+				down: [],
+				up: [],
+			},
+		],
+		feedbacks: [
+			{
+				feedbackId: 'displayColor',
+				options: {
+					section: 'mmss',
+				},
+			},
+		],
+	}
+
 	return presets
 }
