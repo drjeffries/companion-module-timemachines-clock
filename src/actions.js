@@ -1,3 +1,132 @@
+function getBlinkOptions(colorTable) {
+	return [
+		{
+			type: 'dropdown',
+			label: 'Blink Mode',
+			id: 'mode',
+			default: 'brightness',
+			choices: [
+				{ id: 'brightness', label: 'Brightness (On/Off)' },
+				{ id: 'color', label: 'Color Alternate' },
+			],
+		},
+		{
+			type: 'number',
+			label: 'Blink Rate (ms)',
+			id: 'rate',
+			default: 500,
+			min: 100,
+		},
+		{
+			type: 'number',
+			label: 'Digit Brightness When On (0-100)',
+			id: 'digit',
+			range: true,
+			min: 0,
+			max: 100,
+			default: 100,
+			isVisible: (options) => options.mode === 'brightness',
+		},
+		{
+			type: 'number',
+			label: 'Dot/Colon Brightness When On (0-100)',
+			id: 'dot',
+			range: true,
+			min: 0,
+			max: 100,
+			default: 100,
+			isVisible: (options) => options.mode === 'brightness',
+		},
+		{
+			type: 'dropdown',
+			label: 'Color A',
+			id: 'colorA',
+			default: colorTable[0].id,
+			choices: colorTable,
+			isVisible: (options) => options.mode === 'color',
+		},
+		{
+			type: 'number',
+			label: 'Color A - Red',
+			id: 'colorA_r',
+			default: 255,
+			min: 0,
+			max: 255,
+			isVisible: (options) => options.mode === 'color' && options.colorA === 'custom',
+		},
+		{
+			type: 'number',
+			label: 'Color A - Green',
+			id: 'colorA_g',
+			default: 0,
+			min: 0,
+			max: 255,
+			isVisible: (options) => options.mode === 'color' && options.colorA === 'custom',
+		},
+		{
+			type: 'number',
+			label: 'Color A - Blue',
+			id: 'colorA_b',
+			default: 0,
+			min: 0,
+			max: 255,
+			isVisible: (options) => options.mode === 'color' && options.colorA === 'custom',
+		},
+		{
+			type: 'dropdown',
+			label: 'Color B',
+			id: 'colorB',
+			default: colorTable[1].id,
+			choices: colorTable,
+			isVisible: (options) => options.mode === 'color',
+		},
+		{
+			type: 'number',
+			label: 'Color B - Red',
+			id: 'colorB_r',
+			default: 0,
+			min: 0,
+			max: 255,
+			isVisible: (options) => options.mode === 'color' && options.colorB === 'custom',
+		},
+		{
+			type: 'number',
+			label: 'Color B - Green',
+			id: 'colorB_g',
+			default: 255,
+			min: 0,
+			max: 255,
+			isVisible: (options) => options.mode === 'color' && options.colorB === 'custom',
+		},
+		{
+			type: 'number',
+			label: 'Color B - Blue',
+			id: 'colorB_b',
+			default: 0,
+			min: 0,
+			max: 255,
+			isVisible: (options) => options.mode === 'color' && options.colorB === 'custom',
+		},
+	]
+}
+
+function buildBlinkConfig(opt) {
+	return {
+		mode: opt.mode,
+		rate: opt.rate,
+		digit: opt.digit,
+		dot: opt.dot,
+		colorA: {
+			id: opt.colorA,
+			custom: opt.colorA === 'custom' ? { r: opt.colorA_r, g: opt.colorA_g, b: opt.colorA_b } : null,
+		},
+		colorB: {
+			id: opt.colorB,
+			custom: opt.colorB === 'custom' ? { r: opt.colorB_r, g: opt.colorB_g, b: opt.colorB_b } : null,
+		},
+	}
+}
+
 export function getActions() {
 	let actions = {
 		showTimeOfDay: {
@@ -538,42 +667,35 @@ export function getActions() {
 						b: opt.custom_mmss_b,
 					}
 				}
-				this.setDisplayColor(opt.color_mmss, opt.color_hh, custom_hh, custom_mmss)
+				this.setRestingColor(opt.color_mmss, opt.color_hh, custom_hh, custom_mmss)
 			},
 		},
 
 		toggleBlink: {
 			name: 'Toggle Blink',
+			options: getBlinkOptions(this.COLORTABLE),
+			callback: (action) => {
+				this.toggleBlink(buildBlinkConfig(action.options))
+			},
+		},
+
+		quickBlink: {
+			name: 'Quick Blink',
 			options: [
+				...getBlinkOptions(this.COLORTABLE),
 				{
 					type: 'number',
-					label: 'Blink Rate (ms)',
-					id: 'rate',
-					default: 500,
+					label: 'Duration (ms)',
+					id: 'duration',
+					default: 2000,
 					min: 100,
-				},
-				{
-					type: 'number',
-					label: 'Digit Brightness When On (0-100)',
-					id: 'digit',
-					range: true,
-					min: 0,
-					max: 100,
-					default: 100,
-				},
-				{
-					type: 'number',
-					label: 'Dot/Colon Brightness When On (0-100)',
-					id: 'dot',
-					range: true,
-					min: 0,
-					max: 100,
-					default: 100,
 				},
 			],
 			callback: (action) => {
-				let opt = action.options
-				this.toggleBlink(opt.rate, opt.digit, opt.dot)
+				this.quickBlink({
+					...buildBlinkConfig(action.options),
+					duration: action.options.duration,
+				})
 			},
 		},
 

@@ -16,6 +16,7 @@ This module controls clocks from [TimeMachines](https://timemachinescorp.com).
 - Set Display Brightness
 - Set Display Colors
 - Toggle Blink
+- Quick Blink
 - Stop Blink
 
 ### Variables

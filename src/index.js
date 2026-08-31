@@ -21,8 +21,11 @@ class TimeMachinesInstance extends InstanceBase {
 		this.CONNECTED = false //used for friendly notifying of the user that we have not received data yet
 
 		this.BLINK_INTERVAL = null //used to drive the blink (no native blink command exists for the main digits)
+		this.BLINK_TIMEOUT = null //used by Quick Blink's auto-stop
 		this.BLINK_ON = false
+		this.BLINK_MODE = 'brightness' //which resting state to restore ('brightness' or 'color') when the blink stops
 		this.LAST_BRIGHTNESS = { digit: 100, dot: 100 } //remembers the last brightness set through this module, since the clock never reports its brightness back
+		this.LAST_COLOR = { color_mmss: 'white', color_hh: 'white', custom_hh: null, custom_mmss: null } //same idea, for color
 
 		this.DEVICEINFO = {
 			connection: '(Connecting)',
@@ -71,6 +74,11 @@ class TimeMachinesInstance extends InstanceBase {
 		if (this.BLINK_INTERVAL) {
 			clearInterval(this.BLINK_INTERVAL)
 			this.BLINK_INTERVAL = null
+		}
+
+		if (this.BLINK_TIMEOUT) {
+			clearTimeout(this.BLINK_TIMEOUT)
+			this.BLINK_TIMEOUT = null
 		}
 	}
 
@@ -605,26 +613,47 @@ class TimeMachinesInstance extends InstanceBase {
 		this.udp.send(Buffer.from(hexstring, 'hex'))
 	}
 
-	toggleBlink(rate, digitBrightness, dotBrightness) {
-		if (this.BLINK_INTERVAL) {
-			this.stopBlink()
+	setRestingColor(color_mmss, color_hh, custom_hh, custom_mmss) {
+		//same idea as setRestingBrightness - the clock never reports its color back to us
+		this.LAST_COLOR = { color_mmss, color_hh, custom_hh, custom_mmss }
+		this.setDisplayColor(color_mmss, color_hh, custom_hh, custom_mmss)
+	}
+
+	applyBlinkPhase(options, on) {
+		if (options.mode === 'color') {
+			let color = on ? options.colorA : options.colorB
+			this.setDisplayColor(color.id, color.id, color.custom, color.custom)
 		} else {
-			this.startBlink(rate, digitBrightness, dotBrightness)
+			this.setDisplayBrightness(on ? options.digit : 0, on ? options.dot : 0)
 		}
 	}
 
-	startBlink(rate, digitBrightness, dotBrightness) {
+	toggleBlink(options) {
+		if (this.BLINK_INTERVAL) {
+			this.stopBlink()
+		} else {
+			this.startBlink(options)
+		}
+	}
+
+	startBlink(options) {
 		if (this.BLINK_INTERVAL) {
 			clearInterval(this.BLINK_INTERVAL)
 		}
 
+		if (this.BLINK_TIMEOUT) {
+			clearTimeout(this.BLINK_TIMEOUT)
+			this.BLINK_TIMEOUT = null
+		}
+
+		this.BLINK_MODE = options.mode
 		this.BLINK_ON = true
-		this.setDisplayBrightness(digitBrightness, dotBrightness)
+		this.applyBlinkPhase(options, true)
 
 		this.BLINK_INTERVAL = setInterval(() => {
 			this.BLINK_ON = !this.BLINK_ON
-			this.setDisplayBrightness(this.BLINK_ON ? digitBrightness : 0, this.BLINK_ON ? dotBrightness : 0)
-		}, rate)
+			this.applyBlinkPhase(options, this.BLINK_ON)
+		}, options.rate)
 
 		this.checkFeedbacks('blinkActive')
 	}
@@ -636,9 +665,32 @@ class TimeMachinesInstance extends InstanceBase {
 		}
 
 		this.BLINK_ON = false
-		this.setDisplayBrightness(this.LAST_BRIGHTNESS.digit, this.LAST_BRIGHTNESS.dot)
+
+		if (this.BLINK_MODE === 'color') {
+			this.setDisplayColor(
+				this.LAST_COLOR.color_mmss,
+				this.LAST_COLOR.color_hh,
+				this.LAST_COLOR.custom_hh,
+				this.LAST_COLOR.custom_mmss
+			)
+		} else {
+			this.setDisplayBrightness(this.LAST_BRIGHTNESS.digit, this.LAST_BRIGHTNESS.dot)
+		}
 
 		this.checkFeedbacks('blinkActive')
+	}
+
+	quickBlink(options) {
+		this.startBlink(options)
+
+		let ownInterval = this.BLINK_INTERVAL
+		this.BLINK_TIMEOUT = setTimeout(() => {
+			this.BLINK_TIMEOUT = null
+			//only stop if nothing else has taken over the blink in the meantime
+			if (this.BLINK_INTERVAL === ownInterval) {
+				this.stopBlink()
+			}
+		}, options.duration)
 	}
 }
 runEntrypoint(TimeMachinesInstance, UpgradeScripts)
