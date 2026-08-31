@@ -14,12 +14,13 @@ export function getVariables() {
 	variables.push({ variableId: 'timer_state', name: 'Timer State' })
 	variables.push({ variableId: 'timer_seconds', name: 'Timer Remaining (Seconds)' })
 
-	// DD:HH:MM:SS:TT broken out individually, grouped together for easy custom layouts
-	variables.push({ variableId: 'days', name: 'Days (DD)' })
-	variables.push({ variableId: 'hours', name: 'Hours (HH)' })
-	variables.push({ variableId: 'minutes', name: 'Minutes (MM)' })
-	variables.push({ variableId: 'seconds', name: 'Seconds (SS)' })
-	variables.push({ variableId: 'tenths', name: 'Tenths of a Second (TT)' })
+	// DD:HH:MM:SS:TT broken out individually - "digits-" prefix keeps them adjacent in the
+	// variable list, which is sorted alphabetically by variable ID
+	variables.push({ variableId: 'digits-days', name: 'Days (DD)' })
+	variables.push({ variableId: 'digits-hours', name: 'Hours (HH)' })
+	variables.push({ variableId: 'digits-minutes', name: 'Minutes (MM)' })
+	variables.push({ variableId: 'digits-seconds', name: 'Seconds (SS)' })
+	variables.push({ variableId: 'digits-tenths', name: 'Tenths of a Second (TT)' })
 
 	variables.push({ variableId: 'digit_format', name: 'Digit Format' })
 	variables.push({ variableId: 'wifi_signal', name: 'WiFi Signal Strength (dBm, 0 if wired)' })
@@ -45,11 +46,11 @@ export function updateVariables() {
 			timer_state: this.DEVICEINFO.timerStateFriendly,
 			timer_seconds: this.DEVICEINFO.timerSeconds,
 
-			days: this.DEVICEINFO.days,
-			hours: this.DEVICEINFO.hours,
-			minutes: this.DEVICEINFO.minutes,
-			seconds: this.DEVICEINFO.seconds,
-			tenths: this.DEVICEINFO.tenths,
+			'digits-days': this.DEVICEINFO.days,
+			'digits-hours': this.DEVICEINFO.hours,
+			'digits-minutes': this.DEVICEINFO.minutes,
+			'digits-seconds': this.DEVICEINFO.seconds,
+			'digits-tenths': this.DEVICEINFO.tenths,
 
 			digit_format: this.DEVICEINFO.digitFormatFriendly,
 			wifi_signal: this.DEVICEINFO.wifiSignal,
