@@ -598,6 +598,10 @@ class TimeMachinesInstance extends InstanceBase {
 		//color it should currently be
 		this.LAST_COLOR = { color_mmss, color_hh, custom_hh, custom_mmss }
 		this.setDisplayColor(color_mmss, color_hh, custom_hh, custom_mmss)
+
+		//without this, the "Text Color Matches Display Color" feedback would only pick up the change
+		//on the next poll tick instead of the instant Companion pushes the new color
+		this.checkFeedbacks('displayColor')
 	}
 
 	resolveColorRGB(colorId, custom) {
