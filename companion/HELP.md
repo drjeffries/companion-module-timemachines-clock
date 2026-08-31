@@ -47,6 +47,7 @@ This module controls clocks from [TimeMachines](https://timemachinescorp.com).
 - Timer State (Count Up, Count Down) (Running, Stopped)
 - Remaining Seconds on Timer
 - Blink Active
+- Text Color Matches Display Color (reflects only colors set through this module - see note in feedbacks.js)
 
 ### Presets
 

@@ -119,5 +119,40 @@ export function getFeedbacks() {
 		},
 	}
 
+	//NOTE: the clock never reports its display color back to us, so this reflects only what this module
+	//itself last set via "Set Display Colors" (or restored after a color blink). It will be wrong/stale
+	//if the color was changed elsewhere - the clock's own web page, TM-Manager, another Companion
+	//connection, or an Alarm's "CX" color-change event.
+	feedbacks.displayColor = {
+		type: 'advanced',
+		name: 'Text Color Matches Display Color',
+		description:
+			'Sets the button text color to the color this module last set on the clock display. ' +
+			'Cannot detect color changes made outside this module (web page, TM-Manager, alarms, etc).',
+		options: [
+			{
+				type: 'dropdown',
+				label: 'Which Digits',
+				id: 'section',
+				default: 'mmss',
+				choices: [
+					{ id: 'hh', label: 'Hour Digits' },
+					{ id: 'mmss', label: 'Minute/Second Digits' },
+				],
+			},
+		],
+		callback: (feedback) => {
+			let opt = feedback.options
+			let color =
+				opt.section === 'hh'
+					? this.resolveColorRGB(this.LAST_COLOR.color_hh, this.LAST_COLOR.custom_hh)
+					: this.resolveColorRGB(this.LAST_COLOR.color_mmss, this.LAST_COLOR.custom_mmss)
+
+			return {
+				color: combineRgb(color.r, color.g, color.b),
+			}
+		},
+	}
+
 	return feedbacks
 }

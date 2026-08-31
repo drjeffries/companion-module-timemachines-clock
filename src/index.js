@@ -25,7 +25,6 @@ class TimeMachinesInstance extends InstanceBase {
 		this.BLINK_ON = false
 		this.BLINK_MODE = 'brightness' //which resting state to restore ('brightness' or 'color') when the blink stops
 		this.LAST_BRIGHTNESS = { digit: 100, dot: 100 } //remembers the last brightness set through this module, since the clock never reports its brightness back
-		this.LAST_COLOR = { color_mmss: 'white', color_hh: 'white', custom_hh: null, custom_mmss: null } //same idea, for color
 
 		this.DEVICEINFO = {
 			connection: '(Connecting)',
@@ -62,6 +61,10 @@ class TimeMachinesInstance extends InstanceBase {
 			{ id: 'white', label: 'White', r: 255, g: 255, b: 255 },
 			{ id: 'custom', label: 'Custom RGB Value', r: 255, g: 255, b: 255 },
 		]
+		//the clock never reports its display color back to us, so this only reflects what this module
+		//itself last commanded - it will be wrong/stale if color is changed elsewhere (the clock's own
+		//web page, TM-Manager, another Companion connection, or an Alarm's "CX" color-change event)
+		this.LAST_COLOR = { color_mmss: 'white', color_hh: 'white', custom_hh: null, custom_mmss: null }
 
 		this.initConnection()
 
@@ -657,9 +660,19 @@ class TimeMachinesInstance extends InstanceBase {
 	}
 
 	setRestingColor(color_mmss, color_hh, custom_hh, custom_mmss) {
-		//same idea as setRestingBrightness - the clock never reports its color back to us
+		//the clock never reports its color back to us, so this is the only record available of what
+		//color it should currently be
 		this.LAST_COLOR = { color_mmss, color_hh, custom_hh, custom_mmss }
 		this.setDisplayColor(color_mmss, color_hh, custom_hh, custom_mmss)
+
+		//without this, the "Text Color Matches Display Color" feedback would only pick up the change
+		//on the next poll tick instead of the instant Companion pushes the new color
+		this.checkFeedbacks('displayColor')
+	}
+
+	resolveColorRGB(colorId, custom) {
+		let colorObj = colorId === 'custom' ? custom : this.COLORTABLE.find((CLR) => CLR.id == colorId)
+		return colorObj ? { r: colorObj.r, g: colorObj.g, b: colorObj.b } : { r: 255, g: 255, b: 255 }
 	}
 
 	applyBlinkPhase(options, on) {
@@ -716,6 +729,7 @@ class TimeMachinesInstance extends InstanceBase {
 				this.LAST_COLOR.custom_hh,
 				this.LAST_COLOR.custom_mmss
 			)
+			this.checkFeedbacks('displayColor')
 		} else {
 			this.setDisplayBrightness(this.LAST_BRIGHTNESS.digit, this.LAST_BRIGHTNESS.dot)
 		}
