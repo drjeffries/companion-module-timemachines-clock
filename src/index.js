@@ -20,7 +20,7 @@ class TimeMachinesInstance extends InstanceBase {
 		this.INTERVAL = null //used to poll the clock every second
 		this.CONNECTED = false //used for friendly notifying of the user that we have not received data yet
 
-		this.BLINK_INTERVAL = null //used to drive the faux blink (no native blink command exists for the main digits)
+		this.BLINK_INTERVAL = null //used to drive the blink (no native blink command exists for the main digits)
 		this.BLINK_ON = false
 		this.LAST_BRIGHTNESS = { digit: 100, dot: 100 } //remembers the last brightness set through this module, since the clock never reports its brightness back
 
@@ -559,7 +559,7 @@ class TimeMachinesInstance extends InstanceBase {
 
 	setRestingBrightness(digit, dot) {
 		//the clock never reports its brightness back to us, so this is the only record of "normal" brightness
-		//available to restore to once something (like the faux blink) is done overriding it
+		//available to restore to once something (like the blink) is done overriding it
 		this.LAST_BRIGHTNESS = { digit, dot }
 		this.setDisplayBrightness(digit, dot)
 	}
@@ -605,15 +605,15 @@ class TimeMachinesInstance extends InstanceBase {
 		this.udp.send(Buffer.from(hexstring, 'hex'))
 	}
 
-	toggleFauxBlink(rate, digitBrightness, dotBrightness) {
+	toggleBlink(rate, digitBrightness, dotBrightness) {
 		if (this.BLINK_INTERVAL) {
-			this.stopFauxBlink()
+			this.stopBlink()
 		} else {
-			this.startFauxBlink(rate, digitBrightness, dotBrightness)
+			this.startBlink(rate, digitBrightness, dotBrightness)
 		}
 	}
 
-	startFauxBlink(rate, digitBrightness, dotBrightness) {
+	startBlink(rate, digitBrightness, dotBrightness) {
 		if (this.BLINK_INTERVAL) {
 			clearInterval(this.BLINK_INTERVAL)
 		}
@@ -626,10 +626,10 @@ class TimeMachinesInstance extends InstanceBase {
 			this.setDisplayBrightness(this.BLINK_ON ? digitBrightness : 0, this.BLINK_ON ? dotBrightness : 0)
 		}, rate)
 
-		this.checkFeedbacks('fauxBlinkActive')
+		this.checkFeedbacks('blinkActive')
 	}
 
-	stopFauxBlink() {
+	stopBlink() {
 		if (this.BLINK_INTERVAL) {
 			clearInterval(this.BLINK_INTERVAL)
 			this.BLINK_INTERVAL = null
@@ -638,7 +638,7 @@ class TimeMachinesInstance extends InstanceBase {
 		this.BLINK_ON = false
 		this.setDisplayBrightness(this.LAST_BRIGHTNESS.digit, this.LAST_BRIGHTNESS.dot)
 
-		this.checkFeedbacks('fauxBlinkActive')
+		this.checkFeedbacks('blinkActive')
 	}
 }
 runEntrypoint(TimeMachinesInstance, UpgradeScripts)

@@ -542,8 +542,8 @@ export function getActions() {
 			},
 		},
 
-		toggleFauxBlink: {
-			name: 'Toggle Faux Blink',
+		toggleBlink: {
+			name: 'Toggle Blink',
 			options: [
 				{
 					type: 'number',
@@ -573,7 +573,15 @@ export function getActions() {
 			],
 			callback: (action) => {
 				let opt = action.options
-				this.toggleFauxBlink(opt.rate, opt.digit, opt.dot)
+				this.toggleBlink(opt.rate, opt.digit, opt.dot)
+			},
+		},
+
+		stopBlink: {
+			name: 'Stop Blink',
+			options: [],
+			callback: () => {
+				this.stopBlink()
 			},
 		},
 	}

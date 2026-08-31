@@ -105,10 +105,10 @@ export function getFeedbacks() {
 		},
 	}
 
-	feedbacks.fauxBlinkActive = {
+	feedbacks.blinkActive = {
 		type: 'boolean',
-		name: 'Faux Blink Active',
-		description: 'Indicate if the Faux Blink toggle is currently running',
+		name: 'Blink Active',
+		description: 'Indicate if the Blink toggle is currently running',
 		defaultStyle: {
 			color: foregroundColor,
 			bgcolor: backgroundColorRed,

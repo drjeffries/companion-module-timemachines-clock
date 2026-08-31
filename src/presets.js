@@ -679,13 +679,13 @@ export function getPresets() {
 		}
 	}
 
-	presets['toggleFauxBlink'] = {
+	presets['toggleBlink'] = {
 		type: 'button',
-		category: 'Faux Blink',
-		name: 'Toggle Faux Blink',
+		category: 'Blink',
+		name: 'Toggle Blink',
 		style: {
 			style: 'text',
-			text: 'Faux\\nBlink',
+			text: 'Toggle\\nBlink',
 			size: '14',
 			color: ColorWhite,
 			bgcolor: ColorBlack,
@@ -694,7 +694,7 @@ export function getPresets() {
 			{
 				down: [
 					{
-						actionId: 'toggleFauxBlink',
+						actionId: 'toggleBlink',
 						options: {
 							rate: 500,
 							digit: 100,
@@ -707,7 +707,7 @@ export function getPresets() {
 		],
 		feedbacks: [
 			{
-				feedbackId: 'fauxBlinkActive',
+				feedbackId: 'blinkActive',
 				options: {},
 				style: {
 					color: ColorWhite,
@@ -715,6 +715,30 @@ export function getPresets() {
 				},
 			},
 		],
+	}
+
+	presets['stopBlink'] = {
+		type: 'button',
+		category: 'Blink',
+		name: 'Stop Blink',
+		style: {
+			style: 'text',
+			text: 'Stop\\nBlink',
+			size: '14',
+			color: ColorWhite,
+			bgcolor: ColorBlack,
+		},
+		steps: [
+			{
+				down: [
+					{
+						actionId: 'stopBlink',
+					},
+				],
+				up: [],
+			},
+		],
+		feedbacks: [],
 	}
 
 	return presets
