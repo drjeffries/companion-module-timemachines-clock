@@ -20,6 +20,10 @@ class TimeMachinesInstance extends InstanceBase {
 		this.INTERVAL = null //used to poll the clock every second
 		this.CONNECTED = false //used for friendly notifying of the user that we have not received data yet
 
+		this.BLINK_INTERVAL = null //used to drive the faux blink (no native blink command exists for the main digits)
+		this.BLINK_ON = false
+		this.LAST_BRIGHTNESS = { digit: 100, dot: 100 } //remembers the last brightness set through this module, since the clock never reports its brightness back
+
 		this.DEVICEINFO = {
 			connection: '(Connecting)',
 			model: '',
@@ -62,6 +66,11 @@ class TimeMachinesInstance extends InstanceBase {
 		if (this.INTERVAL) {
 			clearInterval(this.INTERVAL)
 			this.INTERVAL = null
+		}
+
+		if (this.BLINK_INTERVAL) {
+			clearInterval(this.BLINK_INTERVAL)
+			this.BLINK_INTERVAL = null
 		}
 	}
 
@@ -547,6 +556,13 @@ class TimeMachinesInstance extends InstanceBase {
 
 		this.udp.send(Buffer.from(hexstring, 'hex'))
 	}
+
+	setRestingBrightness(digit, dot) {
+		//the clock never reports its brightness back to us, so this is the only record of "normal" brightness
+		//available to restore to once something (like the faux blink) is done overriding it
+		this.LAST_BRIGHTNESS = { digit, dot }
+		this.setDisplayBrightness(digit, dot)
+	}
 	setDisplayColor(color_mmss, color_hh, custom_hh, custom_mmss) {
 		let hexstring = ''
 
@@ -587,6 +603,42 @@ class TimeMachinesInstance extends InstanceBase {
 		hexstring = 'B6' + mmss_r_hex + mmss_g_hex + mmss_b_hex + hh_r_hex + hh_g_hex + hh_b_hex
 
 		this.udp.send(Buffer.from(hexstring, 'hex'))
+	}
+
+	toggleFauxBlink(rate, digitBrightness, dotBrightness) {
+		if (this.BLINK_INTERVAL) {
+			this.stopFauxBlink()
+		} else {
+			this.startFauxBlink(rate, digitBrightness, dotBrightness)
+		}
+	}
+
+	startFauxBlink(rate, digitBrightness, dotBrightness) {
+		if (this.BLINK_INTERVAL) {
+			clearInterval(this.BLINK_INTERVAL)
+		}
+
+		this.BLINK_ON = true
+		this.setDisplayBrightness(digitBrightness, dotBrightness)
+
+		this.BLINK_INTERVAL = setInterval(() => {
+			this.BLINK_ON = !this.BLINK_ON
+			this.setDisplayBrightness(this.BLINK_ON ? digitBrightness : 0, this.BLINK_ON ? dotBrightness : 0)
+		}, rate)
+
+		this.checkFeedbacks('fauxBlinkActive')
+	}
+
+	stopFauxBlink() {
+		if (this.BLINK_INTERVAL) {
+			clearInterval(this.BLINK_INTERVAL)
+			this.BLINK_INTERVAL = null
+		}
+
+		this.BLINK_ON = false
+		this.setDisplayBrightness(this.LAST_BRIGHTNESS.digit, this.LAST_BRIGHTNESS.dot)
+
+		this.checkFeedbacks('fauxBlinkActive')
 	}
 }
 runEntrypoint(TimeMachinesInstance, UpgradeScripts)

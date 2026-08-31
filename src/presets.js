@@ -679,5 +679,43 @@ export function getPresets() {
 		}
 	}
 
+	presets['toggleFauxBlink'] = {
+		type: 'button',
+		category: 'Faux Blink',
+		name: 'Toggle Faux Blink',
+		style: {
+			style: 'text',
+			text: 'Faux\\nBlink',
+			size: '14',
+			color: ColorWhite,
+			bgcolor: ColorBlack,
+		},
+		steps: [
+			{
+				down: [
+					{
+						actionId: 'toggleFauxBlink',
+						options: {
+							rate: 500,
+							digit: 100,
+							dot: 100,
+						},
+					},
+				],
+				up: [],
+			},
+		],
+		feedbacks: [
+			{
+				feedbackId: 'fauxBlinkActive',
+				options: {},
+				style: {
+					color: ColorWhite,
+					bgcolor: ColorRed,
+				},
+			},
+		],
+	}
+
 	return presets
 }

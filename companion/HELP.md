@@ -15,6 +15,7 @@ This module controls clocks from [TimeMachines](https://timemachinescorp.com).
 - Relay Close
 - Set Display Brightness
 - Set Display Colors
+- Toggle Faux Blink
 
 ### Variables
 
@@ -30,6 +31,7 @@ This module controls clocks from [TimeMachines](https://timemachinescorp.com).
 - Dispaly Mode (Time of Day, Count Up, Count Down)
 - Timer State (Count Up, Count Down) (Running, Stopped)
 - Remaining Seconds on Timer
+- Faux Blink Active
 
 ### Presets
 
@@ -41,3 +43,4 @@ This module controls clocks from [TimeMachines](https://timemachinescorp.com).
 - Relay Control
 - Display Brightness
 - Display Colors
+- Faux Blink

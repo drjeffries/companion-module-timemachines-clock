@@ -105,5 +105,19 @@ export function getFeedbacks() {
 		},
 	}
 
+	feedbacks.fauxBlinkActive = {
+		type: 'boolean',
+		name: 'Faux Blink Active',
+		description: 'Indicate if the Faux Blink toggle is currently running',
+		defaultStyle: {
+			color: foregroundColor,
+			bgcolor: backgroundColorRed,
+		},
+		options: [],
+		callback: () => {
+			return !!this.BLINK_INTERVAL
+		},
+	}
+
 	return feedbacks
 }

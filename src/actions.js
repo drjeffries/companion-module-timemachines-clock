@@ -444,7 +444,7 @@ export function getActions() {
 			],
 			callback: (action) => {
 				let opt = action.options
-				this.setDisplayBrightness(opt.digit, opt.dot)
+				this.setRestingBrightness(opt.digit, opt.dot)
 			},
 		},
 
@@ -539,6 +539,41 @@ export function getActions() {
 					}
 				}
 				this.setDisplayColor(opt.color_mmss, opt.color_hh, custom_hh, custom_mmss)
+			},
+		},
+
+		toggleFauxBlink: {
+			name: 'Toggle Faux Blink',
+			options: [
+				{
+					type: 'number',
+					label: 'Blink Rate (ms)',
+					id: 'rate',
+					default: 500,
+					min: 100,
+				},
+				{
+					type: 'number',
+					label: 'Digit Brightness When On (0-100)',
+					id: 'digit',
+					range: true,
+					min: 0,
+					max: 100,
+					default: 100,
+				},
+				{
+					type: 'number',
+					label: 'Dot/Colon Brightness When On (0-100)',
+					id: 'dot',
+					range: true,
+					min: 0,
+					max: 100,
+					default: 100,
+				},
+			],
+			callback: (action) => {
+				let opt = action.options
+				this.toggleFauxBlink(opt.rate, opt.digit, opt.dot)
 			},
 		},
 	}
