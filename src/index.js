@@ -31,7 +31,11 @@ class TimeMachinesInstance extends InstanceBase {
 			timerState: '',
 			timerStateFriendly: '',
 			timerSeconds: 0,
-			tenths: 0,
+			days: '000',
+			hours: '00',
+			minutes: '00',
+			seconds: '00',
+			tenths: '0',
 			ip: '',
 			mac: '',
 			ntpSyncCount: 0,
@@ -39,9 +43,7 @@ class TimeMachinesInstance extends InstanceBase {
 			downtimerAlarmDuration: 0,
 			digitFormat: 0,
 			digitFormatFriendly: '',
-			dayCount: 0,
 			wifiSignal: 0,
-			rawStatusHex: '',
 		}
 		this.COLORTABLE = [
 			{ id: 'red', label: 'Red', r: 255, g: 0, b: 0 },
@@ -241,7 +243,6 @@ class TimeMachinesInstance extends InstanceBase {
 		}
 
 		this.DEVICEINFO.model = model
-		this.DEVICEINFO.rawStatusHex = Buffer.from(bytes).toString('hex')
 
 		if (bytes[0] <= 3) {
 			//it's a POE, Wifi, or Dot Matrix model and uses the following bytes structure
@@ -263,7 +264,17 @@ class TimeMachinesInstance extends InstanceBase {
 			this.DEVICEINFO.firmware = firmware
 			this.DEVICEINFO.display = display
 			this.DEVICEINFO.timerSeconds = totalSeconds
-			this.DEVICEINFO.tenths = bytes[18]
+
+			//DD:HH:MM:SS:TT broken out as individual, independently placeable variables
+			//per the Locator Protocol API, the day count spans byte 21 (low 8 bits) and the top 3 bits
+			//of byte 22 (high bits) - the doc's own wording for byte 21 is ambiguous, so verify against
+			//actual hardware if a multi-day countdown value here matters to you
+			let dayCount = (((bytes[22] >> 5) & 0x07) << 8) | bytes[21]
+			this.DEVICEINFO.days = dayCount.toString().padStart(3, '0')
+			this.DEVICEINFO.hours = timerHours.toString().padStart(2, '0')
+			this.DEVICEINFO.minutes = timerMinutes.toString().padStart(2, '0')
+			this.DEVICEINFO.seconds = timerSeconds.toString().padStart(2, '0')
+			this.DEVICEINFO.tenths = bytes[18].toString()
 
 			this.DEVICEINFO.ip = Array.from(bytes.slice(1, 5)).join('.')
 			this.DEVICEINFO.mac = Array.from(bytes.slice(5, 11))
@@ -279,11 +290,6 @@ class TimeMachinesInstance extends InstanceBase {
 			this.DEVICEINFO.digitFormat = digitFormat
 			this.DEVICEINFO.digitFormatFriendly =
 				{ 0: '4/6 Digits', 1: '(D):H:M:S', 2: '(H):M:S.Tenths' }[digitFormat] || 'Unknown'
-
-			//per the Locator Protocol API, the day count spans byte 21 (low 8 bits) and the top 3 bits
-			//of byte 22 (high bits) - the doc's own wording for byte 21 is ambiguous, so verify against
-			//actual hardware if a multi-day countdown value here matters to you
-			this.DEVICEINFO.dayCount = (((bytes[22] >> 5) & 0x07) << 8) | bytes[21]
 
 			this.DEVICEINFO.wifiSignal = bytes[23] === 0 ? 0 : -bytes[23]
 

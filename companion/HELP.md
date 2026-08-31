@@ -27,14 +27,16 @@ This module controls clocks from [TimeMachines](https://timemachinescorp.com).
 - Display Mode (Time of Day, Count Up, Count Down)
 - Timer State
 - Timer Remaining (Seconds)
-- Tenths of a Second
-- Day Count
+- Days (DD)
+- Hours (HH)
+- Minutes (MM)
+- Seconds (SS)
+- Tenths of a Second (TT)
 - Digit Format
 - WiFi Signal Strength
 - NTP Sync Count
 - Downtimer Alarm Enabled
 - Downtimer Alarm Duration
-- Raw Status Packet (Hex) - the full status response from the clock, for anything not already broken out above
 
 ### Feedbacks
 

@@ -13,16 +13,19 @@ export function getVariables() {
 	variables.push({ variableId: 'display_mode', name: 'Display Mode' })
 	variables.push({ variableId: 'timer_state', name: 'Timer State' })
 	variables.push({ variableId: 'timer_seconds', name: 'Timer Remaining (Seconds)' })
-	variables.push({ variableId: 'tenths', name: 'Tenths of a Second' })
-	variables.push({ variableId: 'day_count', name: 'Day Count' })
+
+	// DD:HH:MM:SS:TT broken out individually, grouped together for easy custom layouts
+	variables.push({ variableId: 'days', name: 'Days (DD)' })
+	variables.push({ variableId: 'hours', name: 'Hours (HH)' })
+	variables.push({ variableId: 'minutes', name: 'Minutes (MM)' })
+	variables.push({ variableId: 'seconds', name: 'Seconds (SS)' })
+	variables.push({ variableId: 'tenths', name: 'Tenths of a Second (TT)' })
 
 	variables.push({ variableId: 'digit_format', name: 'Digit Format' })
 	variables.push({ variableId: 'wifi_signal', name: 'WiFi Signal Strength (dBm, 0 if wired)' })
 	variables.push({ variableId: 'ntp_sync_count', name: 'NTP Sync Count' })
 	variables.push({ variableId: 'downtimer_alarm_enabled', name: 'Downtimer Alarm Enabled' })
 	variables.push({ variableId: 'downtimer_alarm_duration', name: 'Downtimer Alarm Duration (Seconds)' })
-
-	variables.push({ variableId: 'raw_status_hex', name: 'Raw Status Packet (Hex)' })
 
 	return variables
 }
@@ -41,16 +44,18 @@ export function updateVariables() {
 			display_mode: this.DEVICEINFO.displayModeFriendly,
 			timer_state: this.DEVICEINFO.timerStateFriendly,
 			timer_seconds: this.DEVICEINFO.timerSeconds,
+
+			days: this.DEVICEINFO.days,
+			hours: this.DEVICEINFO.hours,
+			minutes: this.DEVICEINFO.minutes,
+			seconds: this.DEVICEINFO.seconds,
 			tenths: this.DEVICEINFO.tenths,
-			day_count: this.DEVICEINFO.dayCount,
 
 			digit_format: this.DEVICEINFO.digitFormatFriendly,
 			wifi_signal: this.DEVICEINFO.wifiSignal,
 			ntp_sync_count: this.DEVICEINFO.ntpSyncCount,
 			downtimer_alarm_enabled: this.DEVICEINFO.downtimerAlarmEnabled,
 			downtimer_alarm_duration: this.DEVICEINFO.downtimerAlarmDuration,
-
-			raw_status_hex: this.DEVICEINFO.rawStatusHex,
 		})
 	} catch (error) {}
 }
