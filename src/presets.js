@@ -681,7 +681,7 @@ export function getPresets() {
 
 	presets['displayValueMatchingColor'] = {
 		type: 'button',
-		category: 'Display Colors',
+		category: 'Clock Display',
 		name: 'Display Value, Text Color Matches Display Color',
 		style: {
 			style: 'text',
