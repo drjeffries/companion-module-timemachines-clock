@@ -66,6 +66,23 @@ class TimeMachinesInstance extends InstanceBase {
 		//web page, TM-Manager, another Companion connection, or an Alarm's "CX" color-change event)
 		this.LAST_COLOR = { color_mmss: 'white', color_hh: 'white', custom_hh: null, custom_mmss: null }
 
+		//remembers the last countdown configured/reset through this module, so a plain "Reset" button
+		//can restore it without the operator having to resupply the same values every time
+		this.LAST_COUNTDOWN = { mode: 'sec', hours: 0, minutes: 5, seconds: 0, tseconds: 0, alarmEnable: false, alarmDuration: 3 }
+
+		//presentation-timer automations - all driven off the once-a-second poll in updateData(). Each has
+		//a "triggered" latch so it fires once per countdown run instead of every poll tick while the
+		//condition holds, and re-arms once the countdown moves back above the trigger point or the clock
+		//leaves countdown mode entirely.
+		this.AUTOWARN = { enabled: false, threshold: 30, warnMethod: 'blink', blinkOptions: null, relaySeconds: 2 }
+		this.AUTOWARN_TRIGGERED = false
+
+		this.AUTO_COUNTUP = { enabled: false, mode: 'sec' }
+		this.AUTO_COUNTUP_TRIGGERED = false
+
+		this.TIMES_UP_BLINK = { enabled: false, blinkOptions: null, duration: 3000 }
+		this.TIMES_UP_TRIGGERED = false
+
 		this.initConnection()
 
 		this.initActions()
@@ -278,7 +295,7 @@ class TimeMachinesInstance extends InstanceBase {
 			let timerHours = parseInt(bytes[15])
 			let timerMinutes = parseInt(bytes[16])
 			let timerSeconds = parseInt(bytes[17])
-			let totalSeconds = timerHours * 120 + timerMinutes * 60 + timerSeconds
+			let totalSeconds = timerHours * 3600 + timerMinutes * 60 + timerSeconds
 
 			this.DEVICEINFO.name = name
 			this.DEVICEINFO.firmware = firmware
@@ -352,6 +369,8 @@ class TimeMachinesInstance extends InstanceBase {
 				}
 			}
 		}
+
+		this.checkCountdownAutomations()
 
 		this.checkFeedbacks()
 		this.updateVariables()
@@ -441,6 +460,7 @@ class TimeMachinesInstance extends InstanceBase {
 		}
 
 		this.DEVICEINFO.timerMode = 'down'
+		this.LAST_COUNTDOWN = { mode, hours, minutes, seconds, tseconds, alarmEnable, alarmDuration }
 	}
 
 	controlCountDownTimer(command) {
@@ -490,6 +510,80 @@ class TimeMachinesInstance extends InstanceBase {
 
 		if (hexstring !== '') {
 			this.udp.send(Buffer.from(hexstring, 'hex'))
+		}
+
+		this.LAST_COUNTDOWN = { mode, hours, minutes, seconds, tseconds, alarmEnable, alarmDuration }
+	}
+
+	resetCountDownTimerToLast() {
+		let cfg = this.LAST_COUNTDOWN
+		this.resetCountDownTimer(cfg.mode, cfg.hours, cfg.minutes, cfg.seconds, cfg.tseconds, cfg.alarmEnable, cfg.alarmDuration)
+	}
+
+	configureAutoWarn(config) {
+		this.AUTOWARN = config
+		this.AUTOWARN_TRIGGERED = false
+	}
+
+	configureAutoCountUp(config) {
+		this.AUTO_COUNTUP = config
+		this.AUTO_COUNTUP_TRIGGERED = false
+	}
+
+	configureTimesUpBlink(config) {
+		this.TIMES_UP_BLINK = config
+		this.TIMES_UP_TRIGGERED = false
+	}
+
+	checkCountdownAutomations() {
+		let inCountdown = this.DEVICEINFO.displayMode === 'countdown'
+		let running = this.DEVICEINFO.timerState === 'running'
+		let remaining = this.DEVICEINFO.timerSeconds
+
+		if (!inCountdown) {
+			//left countdown mode entirely - re-arm everything for the next run
+			this.AUTOWARN_TRIGGERED = false
+			this.AUTO_COUNTUP_TRIGGERED = false
+			this.TIMES_UP_TRIGGERED = false
+			return
+		}
+
+		if (this.AUTOWARN.enabled) {
+			if (running && remaining <= this.AUTOWARN.threshold) {
+				if (!this.AUTOWARN_TRIGGERED) {
+					this.AUTOWARN_TRIGGERED = true
+					if (this.AUTOWARN.warnMethod === 'relay') {
+						this.controlRelay(this.AUTOWARN.relaySeconds)
+					} else {
+						this.startBlink(this.AUTOWARN.blinkOptions)
+					}
+				}
+			} else if (remaining > this.AUTOWARN.threshold) {
+				this.AUTOWARN_TRIGGERED = false
+			}
+		}
+
+		if (this.AUTO_COUNTUP.enabled) {
+			if (running && remaining <= 0) {
+				if (!this.AUTO_COUNTUP_TRIGGERED) {
+					this.AUTO_COUNTUP_TRIGGERED = true
+					this.setCountUpTimerMode(this.AUTO_COUNTUP.mode)
+					this.controlCountUpTimer('start')
+				}
+			} else if (remaining > 0) {
+				this.AUTO_COUNTUP_TRIGGERED = false
+			}
+		}
+
+		if (this.TIMES_UP_BLINK.enabled) {
+			if (running && remaining <= 0) {
+				if (!this.TIMES_UP_TRIGGERED) {
+					this.TIMES_UP_TRIGGERED = true
+					this.quickBlink({ ...this.TIMES_UP_BLINK.blinkOptions, duration: this.TIMES_UP_BLINK.duration })
+				}
+			} else if (remaining > 0) {
+				this.TIMES_UP_TRIGGERED = false
+			}
 		}
 	}
 

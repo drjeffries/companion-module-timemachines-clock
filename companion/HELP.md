@@ -18,6 +18,10 @@ This module controls clocks from [TimeMachines](https://timemachinescorp.com).
 - Toggle Blink
 - Quick Blink
 - Stop Blink
+- Reset Countdown Timer (Last Used Values)
+- Configure Auto-Warn At Time Remaining (automatically blinks or pulses the relay once remaining time crosses a threshold)
+- Configure Auto Count-Up After Countdown Expires (automatically switches to Count-Up when a countdown hits zero)
+- Configure Time's Up Blink (automatically blinks once when a countdown hits zero)
 
 ### Variables
 
@@ -60,3 +64,4 @@ This module controls clocks from [TimeMachines](https://timemachinescorp.com).
 - Display Brightness
 - Display Colors
 - Blink
+- Presentation Automation (enable/disable presets for Auto-Warn, Auto Count-Up, and Time's Up Blink)

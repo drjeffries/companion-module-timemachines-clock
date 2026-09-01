@@ -563,6 +563,117 @@ export function getPresets() {
 		feedbacks: [],
 	}
 
+	presets['subtract30sFromTimer'] = {
+		type: 'button',
+		category: 'Countdown Timer',
+		name: `Subtract 30s from Timer`,
+		style: {
+			style: 'text',
+			text: `Subtract 30s\\nfrom Timer`,
+			size: '14',
+			color: ColorWhite,
+			bgcolor: ColorBlack,
+		},
+		steps: [
+			{
+				down: [
+					{
+						actionId: 'decreaseTimerWhileRunning',
+						options: {
+							hours: 0,
+							minutes: 0,
+							seconds: 30,
+						},
+					},
+				],
+				up: [],
+			},
+		],
+		feedbacks: [],
+	}
+
+	presets['subtract1mFromTimer'] = {
+		type: 'button',
+		category: 'Countdown Timer',
+		name: `Subtract 1m from Timer`,
+		style: {
+			style: 'text',
+			text: `Subtract 1m\\nfrom Timer`,
+			size: '14',
+			color: ColorWhite,
+			bgcolor: ColorBlack,
+		},
+		steps: [
+			{
+				down: [
+					{
+						actionId: 'decreaseTimerWhileRunning',
+						options: {
+							hours: 0,
+							minutes: 1,
+							seconds: 0,
+						},
+					},
+				],
+				up: [],
+			},
+		],
+		feedbacks: [],
+	}
+
+	presets['subtract5mFromTimer'] = {
+		type: 'button',
+		category: 'Countdown Timer',
+		name: `Subtract 5m from Timer`,
+		style: {
+			style: 'text',
+			text: `Subtract 5m\\nfrom Timer`,
+			size: '14',
+			color: ColorWhite,
+			bgcolor: ColorBlack,
+		},
+		steps: [
+			{
+				down: [
+					{
+						actionId: 'decreaseTimerWhileRunning',
+						options: {
+							hours: 0,
+							minutes: 5,
+							seconds: 0,
+						},
+					},
+				],
+				up: [],
+			},
+		],
+		feedbacks: [],
+	}
+
+	presets['resetCountDownTimerToLast'] = {
+		type: 'button',
+		category: 'Countdown Timer',
+		name: 'Reset Countdown Timer (Last Used Values)',
+		style: {
+			style: 'text',
+			text: `Reset\\nCountdown`,
+			size: '14',
+			color: ColorWhite,
+			bgcolor: ColorBlack,
+		},
+		steps: [
+			{
+				down: [
+					{
+						actionId: 'resetCountDownTimerToLast',
+					},
+				],
+				up: [],
+			},
+		],
+		feedbacks: [],
+	}
+
 	for (let i = 0; i <= 9; i++) {
 		presets[`executeProgram${[i]}`] = {
 			type: 'button',
@@ -796,6 +907,184 @@ export function getPresets() {
 				down: [
 					{
 						actionId: 'stopBlink',
+					},
+				],
+				up: [],
+			},
+		],
+		feedbacks: [],
+	}
+
+	presets['enableAutoWarn'] = {
+		type: 'button',
+		category: 'Presentation Automation',
+		name: 'Enable Auto-Warn (Red/Yellow Blink at 30s)',
+		style: {
+			style: 'text',
+			text: 'Enable\\nAuto-Warn',
+			size: '14',
+			color: ColorWhite,
+			bgcolor: ColorBlack,
+		},
+		steps: [
+			{
+				down: [
+					{
+						actionId: 'autoWarnConfig',
+						options: {
+							enabled: true,
+							threshold: 30,
+							warnMethod: 'blink',
+							mode: 'brightness',
+							rate: 400,
+							digit: 100,
+							dot: 100,
+							colorA: this.COLORTABLE[0].id,
+							colorB: this.COLORTABLE[5].id,
+						},
+					},
+				],
+				up: [],
+			},
+		],
+		feedbacks: [],
+	}
+
+	presets['disableAutoWarn'] = {
+		type: 'button',
+		category: 'Presentation Automation',
+		name: 'Disable Auto-Warn',
+		style: {
+			style: 'text',
+			text: 'Disable\\nAuto-Warn',
+			size: '14',
+			color: ColorWhite,
+			bgcolor: ColorBlack,
+		},
+		steps: [
+			{
+				down: [
+					{
+						actionId: 'autoWarnConfig',
+						options: {
+							enabled: false,
+						},
+					},
+				],
+				up: [],
+			},
+		],
+		feedbacks: [],
+	}
+
+	presets['enableAutoCountUp'] = {
+		type: 'button',
+		category: 'Presentation Automation',
+		name: 'Enable Auto Count-Up After Countdown',
+		style: {
+			style: 'text',
+			text: 'Enable\\nAuto Count-Up',
+			size: '14',
+			color: ColorWhite,
+			bgcolor: ColorBlack,
+		},
+		steps: [
+			{
+				down: [
+					{
+						actionId: 'autoCountUpConfig',
+						options: {
+							enabled: true,
+							mode: 'sec',
+						},
+					},
+				],
+				up: [],
+			},
+		],
+		feedbacks: [],
+	}
+
+	presets['disableAutoCountUp'] = {
+		type: 'button',
+		category: 'Presentation Automation',
+		name: 'Disable Auto Count-Up After Countdown',
+		style: {
+			style: 'text',
+			text: 'Disable\\nAuto Count-Up',
+			size: '14',
+			color: ColorWhite,
+			bgcolor: ColorBlack,
+		},
+		steps: [
+			{
+				down: [
+					{
+						actionId: 'autoCountUpConfig',
+						options: {
+							enabled: false,
+						},
+					},
+				],
+				up: [],
+			},
+		],
+		feedbacks: [],
+	}
+
+	presets['enableTimesUpBlink'] = {
+		type: 'button',
+		category: 'Presentation Automation',
+		name: "Enable Time's Up Blink",
+		style: {
+			style: 'text',
+			text: "Enable\\nTime's Up",
+			size: '14',
+			color: ColorWhite,
+			bgcolor: ColorBlack,
+		},
+		steps: [
+			{
+				down: [
+					{
+						actionId: 'timesUpBlinkConfig',
+						options: {
+							enabled: true,
+							duration: 3000,
+							mode: 'brightness',
+							rate: 200,
+							digit: 100,
+							dot: 100,
+							colorA: this.COLORTABLE[0].id,
+							colorB: this.COLORTABLE[5].id,
+						},
+					},
+				],
+				up: [],
+			},
+		],
+		feedbacks: [],
+	}
+
+	presets['disableTimesUpBlink'] = {
+		type: 'button',
+		category: 'Presentation Automation',
+		name: "Disable Time's Up Blink",
+		style: {
+			style: 'text',
+			text: "Disable\\nTime's Up",
+			size: '14',
+			color: ColorWhite,
+			bgcolor: ColorBlack,
+		},
+		steps: [
+			{
+				down: [
+					{
+						actionId: 'timesUpBlinkConfig',
+						options: {
+							enabled: false,
+						},
 					},
 				],
 				up: [],

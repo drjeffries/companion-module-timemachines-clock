@@ -127,6 +127,247 @@ function buildBlinkConfig(opt) {
 	}
 }
 
+//Companion serializes isVisible via Function.prototype.toString() and evaluates that source on its own
+//side, with no access to this module's closure - so isVisible functions must be self-contained literals
+//that only reference their `options` argument. That rules out wrapping getBlinkOptions' isVisible
+//functions with a dynamically-built closure (it would reference free variables that don't exist on the
+//other side and silently evaluate as visible). These are full literal copies instead, one per automation
+//action, each with the extra "Enabled"/"Warn Method" condition written directly into every isVisible.
+
+function getAutoWarnBlinkOptions(colorTable) {
+	return [
+		{
+			type: 'dropdown',
+			label: 'Blink Mode',
+			id: 'mode',
+			default: 'brightness',
+			choices: [
+				{ id: 'brightness', label: 'Brightness (On/Off)' },
+				{ id: 'color', label: 'Color Alternate' },
+			],
+			isVisible: (options) => options.enabled && options.warnMethod === 'blink',
+		},
+		{
+			type: 'number',
+			label: 'Blink Rate (ms)',
+			id: 'rate',
+			default: 500,
+			min: 100,
+			isVisible: (options) => options.enabled && options.warnMethod === 'blink',
+		},
+		{
+			type: 'number',
+			label: 'Digit Brightness When On (0-100)',
+			id: 'digit',
+			range: true,
+			min: 0,
+			max: 100,
+			default: 100,
+			isVisible: (options) => options.enabled && options.warnMethod === 'blink' && options.mode === 'brightness',
+		},
+		{
+			type: 'number',
+			label: 'Dot/Colon Brightness When On (0-100)',
+			id: 'dot',
+			range: true,
+			min: 0,
+			max: 100,
+			default: 100,
+			isVisible: (options) => options.enabled && options.warnMethod === 'blink' && options.mode === 'brightness',
+		},
+		{
+			type: 'dropdown',
+			label: 'Color A',
+			id: 'colorA',
+			default: colorTable[0].id,
+			choices: colorTable,
+			isVisible: (options) => options.enabled && options.warnMethod === 'blink' && options.mode === 'color',
+		},
+		{
+			type: 'number',
+			label: 'Color A - Red',
+			id: 'colorA_r',
+			default: 255,
+			min: 0,
+			max: 255,
+			isVisible: (options) =>
+				options.enabled && options.warnMethod === 'blink' && options.mode === 'color' && options.colorA === 'custom',
+		},
+		{
+			type: 'number',
+			label: 'Color A - Green',
+			id: 'colorA_g',
+			default: 0,
+			min: 0,
+			max: 255,
+			isVisible: (options) =>
+				options.enabled && options.warnMethod === 'blink' && options.mode === 'color' && options.colorA === 'custom',
+		},
+		{
+			type: 'number',
+			label: 'Color A - Blue',
+			id: 'colorA_b',
+			default: 0,
+			min: 0,
+			max: 255,
+			isVisible: (options) =>
+				options.enabled && options.warnMethod === 'blink' && options.mode === 'color' && options.colorA === 'custom',
+		},
+		{
+			type: 'dropdown',
+			label: 'Color B',
+			id: 'colorB',
+			default: colorTable[1].id,
+			choices: colorTable,
+			isVisible: (options) => options.enabled && options.warnMethod === 'blink' && options.mode === 'color',
+		},
+		{
+			type: 'number',
+			label: 'Color B - Red',
+			id: 'colorB_r',
+			default: 0,
+			min: 0,
+			max: 255,
+			isVisible: (options) =>
+				options.enabled && options.warnMethod === 'blink' && options.mode === 'color' && options.colorB === 'custom',
+		},
+		{
+			type: 'number',
+			label: 'Color B - Green',
+			id: 'colorB_g',
+			default: 255,
+			min: 0,
+			max: 255,
+			isVisible: (options) =>
+				options.enabled && options.warnMethod === 'blink' && options.mode === 'color' && options.colorB === 'custom',
+		},
+		{
+			type: 'number',
+			label: 'Color B - Blue',
+			id: 'colorB_b',
+			default: 0,
+			min: 0,
+			max: 255,
+			isVisible: (options) =>
+				options.enabled && options.warnMethod === 'blink' && options.mode === 'color' && options.colorB === 'custom',
+		},
+	]
+}
+
+function getTimesUpBlinkOptions(colorTable) {
+	return [
+		{
+			type: 'dropdown',
+			label: 'Blink Mode',
+			id: 'mode',
+			default: 'brightness',
+			choices: [
+				{ id: 'brightness', label: 'Brightness (On/Off)' },
+				{ id: 'color', label: 'Color Alternate' },
+			],
+			isVisible: (options) => options.enabled,
+		},
+		{
+			type: 'number',
+			label: 'Blink Rate (ms)',
+			id: 'rate',
+			default: 200,
+			min: 100,
+			isVisible: (options) => options.enabled,
+		},
+		{
+			type: 'number',
+			label: 'Digit Brightness When On (0-100)',
+			id: 'digit',
+			range: true,
+			min: 0,
+			max: 100,
+			default: 100,
+			isVisible: (options) => options.enabled && options.mode === 'brightness',
+		},
+		{
+			type: 'number',
+			label: 'Dot/Colon Brightness When On (0-100)',
+			id: 'dot',
+			range: true,
+			min: 0,
+			max: 100,
+			default: 100,
+			isVisible: (options) => options.enabled && options.mode === 'brightness',
+		},
+		{
+			type: 'dropdown',
+			label: 'Color A',
+			id: 'colorA',
+			default: colorTable[0].id,
+			choices: colorTable,
+			isVisible: (options) => options.enabled && options.mode === 'color',
+		},
+		{
+			type: 'number',
+			label: 'Color A - Red',
+			id: 'colorA_r',
+			default: 255,
+			min: 0,
+			max: 255,
+			isVisible: (options) => options.enabled && options.mode === 'color' && options.colorA === 'custom',
+		},
+		{
+			type: 'number',
+			label: 'Color A - Green',
+			id: 'colorA_g',
+			default: 0,
+			min: 0,
+			max: 255,
+			isVisible: (options) => options.enabled && options.mode === 'color' && options.colorA === 'custom',
+		},
+		{
+			type: 'number',
+			label: 'Color A - Blue',
+			id: 'colorA_b',
+			default: 0,
+			min: 0,
+			max: 255,
+			isVisible: (options) => options.enabled && options.mode === 'color' && options.colorA === 'custom',
+		},
+		{
+			type: 'dropdown',
+			label: 'Color B',
+			id: 'colorB',
+			default: colorTable[1].id,
+			choices: colorTable,
+			isVisible: (options) => options.enabled && options.mode === 'color',
+		},
+		{
+			type: 'number',
+			label: 'Color B - Red',
+			id: 'colorB_r',
+			default: 0,
+			min: 0,
+			max: 255,
+			isVisible: (options) => options.enabled && options.mode === 'color' && options.colorB === 'custom',
+		},
+		{
+			type: 'number',
+			label: 'Color B - Green',
+			id: 'colorB_g',
+			default: 255,
+			min: 0,
+			max: 255,
+			isVisible: (options) => options.enabled && options.mode === 'color' && options.colorB === 'custom',
+		},
+		{
+			type: 'number',
+			label: 'Color B - Blue',
+			id: 'colorB_b',
+			default: 0,
+			min: 0,
+			max: 255,
+			isVisible: (options) => options.enabled && options.mode === 'color' && options.colorB === 'custom',
+		},
+	]
+}
+
 export function getActions() {
 	let actions = {
 		showTimeOfDay: {
@@ -399,6 +640,14 @@ export function getActions() {
 					opt.alarmEnable,
 					opt.alarmDuration
 				)
+			},
+		},
+
+		resetCountDownTimerToLast: {
+			name: 'Reset Countdown Timer (Last Used Values)',
+			options: [],
+			callback: () => {
+				this.resetCountDownTimerToLast()
 			},
 		},
 
@@ -704,6 +953,112 @@ export function getActions() {
 			options: [],
 			callback: () => {
 				this.stopBlink()
+			},
+		},
+
+		autoWarnConfig: {
+			name: 'Configure Auto-Warn At Time Remaining',
+			options: [
+				{
+					type: 'checkbox',
+					label: 'Enabled',
+					id: 'enabled',
+					default: false,
+				},
+				{
+					type: 'number',
+					label: 'Warn When Remaining Seconds <=',
+					id: 'threshold',
+					default: 30,
+					min: 1,
+					isVisible: (options) => options.enabled,
+				},
+				{
+					type: 'dropdown',
+					label: 'Warn Method',
+					id: 'warnMethod',
+					default: 'blink',
+					choices: [
+						{ id: 'blink', label: 'Blink' },
+						{ id: 'relay', label: 'Relay Pulse' },
+					],
+					isVisible: (options) => options.enabled,
+				},
+				{
+					type: 'number',
+					label: 'Relay Pulse Duration (seconds)',
+					id: 'relaySeconds',
+					default: 2,
+					min: 1,
+					isVisible: (options) => options.enabled && options.warnMethod === 'relay',
+				},
+				...getAutoWarnBlinkOptions(this.COLORTABLE),
+			],
+			callback: (action) => {
+				let opt = action.options
+				this.configureAutoWarn({
+					enabled: opt.enabled,
+					threshold: opt.threshold,
+					warnMethod: opt.warnMethod,
+					relaySeconds: opt.relaySeconds,
+					blinkOptions: buildBlinkConfig(opt),
+				})
+			},
+		},
+
+		autoCountUpConfig: {
+			name: 'Configure Auto Count-Up After Countdown Expires',
+			options: [
+				{
+					type: 'checkbox',
+					label: 'Enabled',
+					id: 'enabled',
+					default: false,
+				},
+				{
+					type: 'dropdown',
+					label: 'Count-Up Display Mode',
+					id: 'mode',
+					default: 'sec',
+					choices: [
+						{ id: 'sec', label: 'Hours, Minutes, & Seconds' },
+						{ id: 'tsec', label: 'Minutes, Seconds, & Tenths of Seconds' },
+					],
+					isVisible: (options) => options.enabled,
+				},
+			],
+			callback: (action) => {
+				let opt = action.options
+				this.configureAutoCountUp({ enabled: opt.enabled, mode: opt.mode })
+			},
+		},
+
+		timesUpBlinkConfig: {
+			name: "Configure Time's Up Blink",
+			options: [
+				{
+					type: 'checkbox',
+					label: 'Enabled',
+					id: 'enabled',
+					default: false,
+				},
+				{
+					type: 'number',
+					label: 'Blink Duration (ms)',
+					id: 'duration',
+					default: 3000,
+					min: 100,
+					isVisible: (options) => options.enabled,
+				},
+				...getTimesUpBlinkOptions(this.COLORTABLE),
+			],
+			callback: (action) => {
+				let opt = action.options
+				this.configureTimesUpBlink({
+					enabled: opt.enabled,
+					duration: opt.duration,
+					blinkOptions: buildBlinkConfig(opt),
+				})
 			},
 		},
 	}
