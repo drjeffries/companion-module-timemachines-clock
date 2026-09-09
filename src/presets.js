@@ -28,6 +28,88 @@ export function getPresets() {
 		feedbacks: [],
 	}
 
+	// full-button single-digit-group displays - place DD/HH/MM/SS adjacently (e.g. 4 buttons in a
+	// row) to build a combined DD:HH:MM:SS readout across a Stream Deck/Companion grid
+	presets['digitsDaysDisplay'] = {
+		type: 'button',
+		category: 'Digit Display',
+		name: 'Days Display (DD)',
+		style: {
+			style: 'text',
+			text: '$(tm-clock:digits-days)',
+			size: '44',
+			color: ColorWhite,
+			bgcolor: ColorBlack,
+		},
+		steps: [
+			{
+				down: [],
+				up: [],
+			},
+		],
+		feedbacks: [],
+	}
+
+	presets['digitsHoursDisplay'] = {
+		type: 'button',
+		category: 'Digit Display',
+		name: 'Hours Display (HH)',
+		style: {
+			style: 'text',
+			text: '$(tm-clock:digits-hours)',
+			size: '44',
+			color: ColorWhite,
+			bgcolor: ColorBlack,
+		},
+		steps: [
+			{
+				down: [],
+				up: [],
+			},
+		],
+		feedbacks: [],
+	}
+
+	presets['digitsMinutesDisplay'] = {
+		type: 'button',
+		category: 'Digit Display',
+		name: 'Minutes Display (MM)',
+		style: {
+			style: 'text',
+			text: '$(tm-clock:digits-minutes)',
+			size: '44',
+			color: ColorWhite,
+			bgcolor: ColorBlack,
+		},
+		steps: [
+			{
+				down: [],
+				up: [],
+			},
+		],
+		feedbacks: [],
+	}
+
+	presets['digitsSecondsDisplay'] = {
+		type: 'button',
+		category: 'Digit Display',
+		name: 'Seconds Display (SS)',
+		style: {
+			style: 'text',
+			text: '$(tm-clock:digits-seconds)',
+			size: '44',
+			color: ColorWhite,
+			bgcolor: ColorBlack,
+		},
+		steps: [
+			{
+				down: [],
+				up: [],
+			},
+		],
+		feedbacks: [],
+	}
+
 	presets['showTimeOfDay'] = {
 		type: 'button',
 		category: 'Clock Mode',

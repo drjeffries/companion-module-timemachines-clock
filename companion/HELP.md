@@ -64,4 +64,5 @@ This module controls clocks from [TimeMachines](https://timemachinescorp.com).
 - Display Brightness
 - Display Colors
 - Blink
+- Digit Display (full-button DD/HH/MM/SS displays, for building a combined readout across adjacent buttons)
 - Presentation Automation (enable/disable presets for Auto-Warn, Auto Count-Up, and Time's Up Blink)
