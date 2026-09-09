@@ -558,20 +558,24 @@ export function getPresets() {
 		feedbacks: [],
 	}
 
+	// press-and-release-within-1s (short release) triggers the adjustment, rather than firing
+	// immediately on press - the 1000ms duration group also reserves a "held longer" bucket for a
+	// future long-press action, left empty for now
 	presets['add30sToTimer'] = {
 		type: 'button',
 		category: 'Countdown Timer',
-		name: `Add 30s to Timer`,
+		name: `+30 Sec`,
 		style: {
 			style: 'text',
-			text: `Add 30s to Timer`,
+			text: `+30 Sec`,
 			size: '14',
 			color: ColorWhite,
 			bgcolor: ColorBlack,
 		},
 		steps: [
 			{
-				down: [
+				down: [],
+				up: [
 					{
 						actionId: 'increaseTimerWhileRunning',
 						options: {
@@ -581,7 +585,7 @@ export function getPresets() {
 						},
 					},
 				],
-				up: [],
+				1000: [],
 			},
 		],
 		feedbacks: [],
@@ -590,17 +594,18 @@ export function getPresets() {
 	presets['add1mToTimer'] = {
 		type: 'button',
 		category: 'Countdown Timer',
-		name: `Add 1m to Timer`,
+		name: `+1 Min`,
 		style: {
 			style: 'text',
-			text: `Add 1m to Timer`,
+			text: `+1 Min`,
 			size: '14',
 			color: ColorWhite,
 			bgcolor: ColorBlack,
 		},
 		steps: [
 			{
-				down: [
+				down: [],
+				up: [
 					{
 						actionId: 'increaseTimerWhileRunning',
 						options: {
@@ -610,7 +615,7 @@ export function getPresets() {
 						},
 					},
 				],
-				up: [],
+				1000: [],
 			},
 		],
 		feedbacks: [],
@@ -619,17 +624,18 @@ export function getPresets() {
 	presets['add5mToTimer'] = {
 		type: 'button',
 		category: 'Countdown Timer',
-		name: `Add 5m to Timer`,
+		name: `+5 Min`,
 		style: {
 			style: 'text',
-			text: `Add 5m to Timer`,
+			text: `+5 Min`,
 			size: '14',
 			color: ColorWhite,
 			bgcolor: ColorBlack,
 		},
 		steps: [
 			{
-				down: [
+				down: [],
+				up: [
 					{
 						actionId: 'increaseTimerWhileRunning',
 						options: {
@@ -639,7 +645,7 @@ export function getPresets() {
 						},
 					},
 				],
-				up: [],
+				1000: [],
 			},
 		],
 		feedbacks: [],
@@ -648,17 +654,18 @@ export function getPresets() {
 	presets['subtract30sFromTimer'] = {
 		type: 'button',
 		category: 'Countdown Timer',
-		name: `Subtract 30s from Timer`,
+		name: `-30 Sec`,
 		style: {
 			style: 'text',
-			text: `Subtract 30s\\nfrom Timer`,
+			text: `-30 Sec`,
 			size: '14',
 			color: ColorWhite,
 			bgcolor: ColorBlack,
 		},
 		steps: [
 			{
-				down: [
+				down: [],
+				up: [
 					{
 						actionId: 'decreaseTimerWhileRunning',
 						options: {
@@ -668,7 +675,7 @@ export function getPresets() {
 						},
 					},
 				],
-				up: [],
+				1000: [],
 			},
 		],
 		feedbacks: [],
@@ -677,17 +684,18 @@ export function getPresets() {
 	presets['subtract1mFromTimer'] = {
 		type: 'button',
 		category: 'Countdown Timer',
-		name: `Subtract 1m from Timer`,
+		name: `-1 Min`,
 		style: {
 			style: 'text',
-			text: `Subtract 1m\\nfrom Timer`,
+			text: `-1 Min`,
 			size: '14',
 			color: ColorWhite,
 			bgcolor: ColorBlack,
 		},
 		steps: [
 			{
-				down: [
+				down: [],
+				up: [
 					{
 						actionId: 'decreaseTimerWhileRunning',
 						options: {
@@ -697,7 +705,7 @@ export function getPresets() {
 						},
 					},
 				],
-				up: [],
+				1000: [],
 			},
 		],
 		feedbacks: [],
@@ -706,17 +714,18 @@ export function getPresets() {
 	presets['subtract5mFromTimer'] = {
 		type: 'button',
 		category: 'Countdown Timer',
-		name: `Subtract 5m from Timer`,
+		name: `-5 Min`,
 		style: {
 			style: 'text',
-			text: `Subtract 5m\\nfrom Timer`,
+			text: `-5 Min`,
 			size: '14',
 			color: ColorWhite,
 			bgcolor: ColorBlack,
 		},
 		steps: [
 			{
-				down: [
+				down: [],
+				up: [
 					{
 						actionId: 'decreaseTimerWhileRunning',
 						options: {
@@ -726,7 +735,7 @@ export function getPresets() {
 						},
 					},
 				],
-				up: [],
+				1000: [],
 			},
 		],
 		feedbacks: [],
