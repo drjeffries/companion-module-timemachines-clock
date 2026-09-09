@@ -799,13 +799,15 @@ class TimeMachinesInstance extends InstanceBase {
 		this.BLINK_MODE = options.mode
 		this.BLINK_ON = true
 		this.applyBlinkPhase(options, true)
+		this.checkFeedbacks('blinkActive')
 
 		this.BLINK_INTERVAL = setInterval(() => {
 			this.BLINK_ON = !this.BLINK_ON
 			this.applyBlinkPhase(options, this.BLINK_ON)
+			//re-check every tick, not just at start, so any button using the Blink Active feedback
+			//actually blinks in step with the clock instead of just lighting up once and staying lit
+			this.checkFeedbacks('blinkActive')
 		}, options.rate)
-
-		this.checkFeedbacks('blinkActive')
 	}
 
 	stopBlink() {

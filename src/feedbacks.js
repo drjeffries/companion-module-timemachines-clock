@@ -108,14 +108,16 @@ export function getFeedbacks() {
 	feedbacks.blinkActive = {
 		type: 'boolean',
 		name: 'Blink Active',
-		description: 'Indicate if the Blink toggle is currently running',
+		description:
+			'Flashes in step with the blink itself (true during the "on" phase, false during "off") so the ' +
+			'button actually blinks along with the clock, rather than just staying lit while blink is toggled on.',
 		defaultStyle: {
 			color: foregroundColor,
 			bgcolor: backgroundColorRed,
 		},
 		options: [],
 		callback: () => {
-			return !!this.BLINK_INTERVAL
+			return this.BLINK_ON
 		},
 	}
 
