@@ -1,4 +1,5 @@
 import { combineRgb } from '@companion-module/base'
+import { TOGGLE_ON_PNG64 } from './toggle-icons.js'
 
 export function getFeedbacks() {
 	const feedbacks = {}
@@ -118,6 +119,41 @@ export function getFeedbacks() {
 		options: [],
 		callback: () => {
 			return this.BLINK_ON
+		},
+	}
+
+	//These three are 'advanced' rather than 'boolean' feedbacks specifically so their png64 override
+	//is applied via callback return value instead of defaultStyle. Tested live against Companion 5.0.4:
+	//a boolean feedback's defaultStyle.png64 silently blanks the entire button (image AND text) whenever
+	//the feedback is true, even though the exact same png64 works fine as a preset's own base style.
+	//Returning it from an advanced feedback's callback renders correctly.
+	feedbacks.autoWarnEnabled = {
+		type: 'advanced',
+		name: 'Auto-Warn Enabled',
+		description: 'Switches the toggle-switch graphic to ON while Auto-Warn is armed.',
+		options: [],
+		callback: () => {
+			return this.AUTOWARN.enabled ? { png64: TOGGLE_ON_PNG64 } : {}
+		},
+	}
+
+	feedbacks.autoCountUpEnabled = {
+		type: 'advanced',
+		name: 'Auto Count-Up Enabled',
+		description: 'Switches the toggle-switch graphic to ON while Auto Count-Up is armed.',
+		options: [],
+		callback: () => {
+			return this.AUTO_COUNTUP.enabled ? { png64: TOGGLE_ON_PNG64 } : {}
+		},
+	}
+
+	feedbacks.timesUpBlinkEnabled = {
+		type: 'advanced',
+		name: "Time's Up Blink Enabled",
+		description: "Switches the toggle-switch graphic to ON while Time's Up Blink is armed.",
+		options: [],
+		callback: () => {
+			return this.TIMES_UP_BLINK.enabled ? { png64: TOGGLE_ON_PNG64 } : {}
 		},
 	}
 

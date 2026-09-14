@@ -254,6 +254,122 @@ function getAutoWarnBlinkOptions(colorTable) {
 	]
 }
 
+//Same isVisible constraint as getAutoWarnBlinkOptions above - literal copy with the "enabled" clause
+//dropped, since the toggle action has no enabled checkbox (pressing the button IS the enable/disable).
+function getAutoWarnToggleBlinkOptions(colorTable) {
+	return [
+		{
+			type: 'dropdown',
+			label: 'Blink Mode',
+			id: 'mode',
+			default: 'brightness',
+			choices: [
+				{ id: 'brightness', label: 'Brightness (On/Off)' },
+				{ id: 'color', label: 'Color Alternate' },
+			],
+			isVisible: (options) => options.warnMethod === 'blink',
+		},
+		{
+			type: 'number',
+			label: 'Blink Rate (ms)',
+			id: 'rate',
+			default: 500,
+			min: 100,
+			isVisible: (options) => options.warnMethod === 'blink',
+		},
+		{
+			type: 'number',
+			label: 'Digit Brightness When On (0-100)',
+			id: 'digit',
+			range: true,
+			min: 0,
+			max: 100,
+			default: 100,
+			isVisible: (options) => options.warnMethod === 'blink' && options.mode === 'brightness',
+		},
+		{
+			type: 'number',
+			label: 'Dot/Colon Brightness When On (0-100)',
+			id: 'dot',
+			range: true,
+			min: 0,
+			max: 100,
+			default: 100,
+			isVisible: (options) => options.warnMethod === 'blink' && options.mode === 'brightness',
+		},
+		{
+			type: 'dropdown',
+			label: 'Color A',
+			id: 'colorA',
+			default: colorTable[0].id,
+			choices: colorTable,
+			isVisible: (options) => options.warnMethod === 'blink' && options.mode === 'color',
+		},
+		{
+			type: 'number',
+			label: 'Color A - Red',
+			id: 'colorA_r',
+			default: 255,
+			min: 0,
+			max: 255,
+			isVisible: (options) => options.warnMethod === 'blink' && options.mode === 'color' && options.colorA === 'custom',
+		},
+		{
+			type: 'number',
+			label: 'Color A - Green',
+			id: 'colorA_g',
+			default: 0,
+			min: 0,
+			max: 255,
+			isVisible: (options) => options.warnMethod === 'blink' && options.mode === 'color' && options.colorA === 'custom',
+		},
+		{
+			type: 'number',
+			label: 'Color A - Blue',
+			id: 'colorA_b',
+			default: 0,
+			min: 0,
+			max: 255,
+			isVisible: (options) => options.warnMethod === 'blink' && options.mode === 'color' && options.colorA === 'custom',
+		},
+		{
+			type: 'dropdown',
+			label: 'Color B',
+			id: 'colorB',
+			default: colorTable[1].id,
+			choices: colorTable,
+			isVisible: (options) => options.warnMethod === 'blink' && options.mode === 'color',
+		},
+		{
+			type: 'number',
+			label: 'Color B - Red',
+			id: 'colorB_r',
+			default: 0,
+			min: 0,
+			max: 255,
+			isVisible: (options) => options.warnMethod === 'blink' && options.mode === 'color' && options.colorB === 'custom',
+		},
+		{
+			type: 'number',
+			label: 'Color B - Green',
+			id: 'colorB_g',
+			default: 255,
+			min: 0,
+			max: 255,
+			isVisible: (options) => options.warnMethod === 'blink' && options.mode === 'color' && options.colorB === 'custom',
+		},
+		{
+			type: 'number',
+			label: 'Color B - Blue',
+			id: 'colorB_b',
+			default: 0,
+			min: 0,
+			max: 255,
+			isVisible: (options) => options.warnMethod === 'blink' && options.mode === 'color' && options.colorB === 'custom',
+		},
+	]
+}
+
 function getTimesUpBlinkOptions(colorTable) {
 	return [
 		{
@@ -1056,6 +1172,87 @@ export function getActions() {
 				let opt = action.options
 				this.configureTimesUpBlink({
 					enabled: opt.enabled,
+					duration: opt.duration,
+					blinkOptions: buildBlinkConfig(opt),
+				})
+			},
+		},
+
+		toggleAutoWarn: {
+			name: 'Toggle Auto-Warn At Time Remaining',
+			options: [
+				{
+					type: 'number',
+					label: 'Warn When Remaining Seconds <=',
+					id: 'threshold',
+					default: 30,
+					min: 1,
+				},
+				{
+					type: 'dropdown',
+					label: 'Warn Method',
+					id: 'warnMethod',
+					default: 'blink',
+					choices: [
+						{ id: 'blink', label: 'Blink' },
+						{ id: 'relay', label: 'Relay Pulse' },
+					],
+				},
+				{
+					type: 'number',
+					label: 'Relay Pulse Duration (seconds)',
+					id: 'relaySeconds',
+					default: 2,
+					min: 1,
+					isVisible: (options) => options.warnMethod === 'relay',
+				},
+				...getAutoWarnToggleBlinkOptions(this.COLORTABLE),
+			],
+			callback: (action) => {
+				let opt = action.options
+				this.toggleAutoWarn({
+					threshold: opt.threshold,
+					warnMethod: opt.warnMethod,
+					relaySeconds: opt.relaySeconds,
+					blinkOptions: buildBlinkConfig(opt),
+				})
+			},
+		},
+
+		toggleAutoCountUp: {
+			name: 'Toggle Auto Count-Up After Countdown Expires',
+			options: [
+				{
+					type: 'dropdown',
+					label: 'Count-Up Display Mode',
+					id: 'mode',
+					default: 'sec',
+					choices: [
+						{ id: 'sec', label: 'Hours, Minutes, & Seconds' },
+						{ id: 'tsec', label: 'Minutes, Seconds, & Tenths of Seconds' },
+					],
+				},
+			],
+			callback: (action) => {
+				this.toggleAutoCountUp({ mode: action.options.mode })
+			},
+		},
+
+		toggleTimesUpBlink: {
+			name: "Toggle Time's Up Blink",
+			options: [
+				{
+					type: 'number',
+					label: 'Blink Duration (ms)',
+					id: 'duration',
+					default: 3000,
+					min: 100,
+				},
+				...getBlinkOptions(this.COLORTABLE),
+			],
+			callback: (action) => {
+				let opt = action.options
+				this.toggleTimesUpBlink({
 					duration: opt.duration,
 					blinkOptions: buildBlinkConfig(opt),
 				})

@@ -28,6 +28,10 @@ export function getVariables() {
 	variables.push({ variableId: 'downtimer_alarm_enabled', name: 'Downtimer Alarm Enabled' })
 	variables.push({ variableId: 'downtimer_alarm_duration', name: 'Downtimer Alarm Duration (Seconds)' })
 
+	variables.push({ variableId: 'auto_warn_enabled', name: 'Auto-Warn Enabled' })
+	variables.push({ variableId: 'auto_count_up_enabled', name: 'Auto Count-Up Enabled' })
+	variables.push({ variableId: 'times_up_blink_enabled', name: "Time's Up Blink Enabled" })
+
 	return variables
 }
 
@@ -57,6 +61,10 @@ export function updateVariables() {
 			ntp_sync_count: this.DEVICEINFO.ntpSyncCount,
 			downtimer_alarm_enabled: this.DEVICEINFO.downtimerAlarmEnabled,
 			downtimer_alarm_duration: this.DEVICEINFO.downtimerAlarmDuration,
+
+			auto_warn_enabled: this.AUTOWARN.enabled,
+			auto_count_up_enabled: this.AUTO_COUNTUP.enabled,
+			times_up_blink_enabled: this.TIMES_UP_BLINK.enabled,
 		})
 	} catch (error) {}
 }

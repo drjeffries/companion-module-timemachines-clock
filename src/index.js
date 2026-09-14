@@ -24,6 +24,7 @@ class TimeMachinesInstance extends InstanceBase {
 		this.BLINK_TIMEOUT = null //used by Quick Blink's auto-stop
 		this.BLINK_ON = false
 		this.BLINK_MODE = 'brightness' //which resting state to restore ('brightness' or 'color') when the blink stops
+		this.BLINK_SOURCE = null //who started the current blink ('manual', 'autowarn', 'timesup') - lets each automation stop only its own blink
 		this.LAST_BRIGHTNESS = { digit: 100, dot: 100 } //remembers the last brightness set through this module, since the clock never reports its brightness back
 
 		this.DEVICEINFO = {
@@ -521,18 +522,49 @@ class TimeMachinesInstance extends InstanceBase {
 	}
 
 	configureAutoWarn(config) {
+		//stop a blink Auto-Warn itself started if it's being disarmed mid-warn - otherwise disabling it
+		//while already blinking (e.g. toggling off inside the last 30 seconds) leaves the clock blinking
+		//forever with nothing left armed to turn it off
+		if (!config.enabled && this.AUTOWARN_TRIGGERED && this.AUTOWARN.warnMethod === 'blink' && this.BLINK_SOURCE === 'autowarn') {
+			this.stopBlink()
+		}
+
 		this.AUTOWARN = config
 		this.AUTOWARN_TRIGGERED = false
+		this.checkFeedbacks('autoWarnEnabled')
+		this.updateVariables()
+	}
+
+	toggleAutoWarn(config) {
+		this.configureAutoWarn({ ...config, enabled: !this.AUTOWARN.enabled })
 	}
 
 	configureAutoCountUp(config) {
 		this.AUTO_COUNTUP = config
 		this.AUTO_COUNTUP_TRIGGERED = false
+		this.checkFeedbacks('autoCountUpEnabled')
+		this.updateVariables()
+	}
+
+	toggleAutoCountUp(config) {
+		this.configureAutoCountUp({ ...config, enabled: !this.AUTO_COUNTUP.enabled })
 	}
 
 	configureTimesUpBlink(config) {
+		//same reasoning as configureAutoWarn above - don't leave a quick-blink running with nothing
+		//armed to stop it if it's disarmed mid-flash
+		if (!config.enabled && this.TIMES_UP_TRIGGERED && this.BLINK_SOURCE === 'timesup') {
+			this.stopBlink()
+		}
+
 		this.TIMES_UP_BLINK = config
 		this.TIMES_UP_TRIGGERED = false
+		this.checkFeedbacks('timesUpBlinkEnabled')
+		this.updateVariables()
+	}
+
+	toggleTimesUpBlink(config) {
+		this.configureTimesUpBlink({ ...config, enabled: !this.TIMES_UP_BLINK.enabled })
 	}
 
 	checkCountdownAutomations() {
@@ -541,10 +573,19 @@ class TimeMachinesInstance extends InstanceBase {
 		let remaining = this.DEVICEINFO.timerSeconds
 
 		if (!inCountdown) {
-			//left countdown mode entirely - re-arm everything for the next run
+			//left countdown mode entirely - re-arm everything for the next run, and stop an Auto-Warn
+			//blink still running (e.g. Auto Count-Up switched away from countdown while Auto-Warn was
+			//mid-blink) since it has no other way to know its countdown window just ended and would
+			//otherwise be left blinking forever. Times Up's blink is NOT touched here - it's a
+			//self-timed quickBlink that must keep running for its own configured duration regardless
+			//of display mode; stopping it here would cut it short the instant Auto Count-Up switches
+			//modes, which happens on the very next poll after it starts.
 			this.AUTOWARN_TRIGGERED = false
 			this.AUTO_COUNTUP_TRIGGERED = false
 			this.TIMES_UP_TRIGGERED = false
+			if (this.BLINK_SOURCE === 'autowarn') {
+				this.stopBlink()
+			}
 			return
 		}
 
@@ -555,7 +596,7 @@ class TimeMachinesInstance extends InstanceBase {
 					if (this.AUTOWARN.warnMethod === 'relay') {
 						this.controlRelay(this.AUTOWARN.relaySeconds)
 					} else {
-						this.startBlink(this.AUTOWARN.blinkOptions)
+						this.startBlink(this.AUTOWARN.blinkOptions, 'autowarn')
 					}
 				}
 			} else if (remaining > this.AUTOWARN.threshold) {
@@ -579,7 +620,7 @@ class TimeMachinesInstance extends InstanceBase {
 			if (running && remaining <= 0) {
 				if (!this.TIMES_UP_TRIGGERED) {
 					this.TIMES_UP_TRIGGERED = true
-					this.quickBlink({ ...this.TIMES_UP_BLINK.blinkOptions, duration: this.TIMES_UP_BLINK.duration })
+					this.quickBlink({ ...this.TIMES_UP_BLINK.blinkOptions, duration: this.TIMES_UP_BLINK.duration }, 'timesup')
 				}
 			} else if (remaining > 0) {
 				this.TIMES_UP_TRIGGERED = false
@@ -786,7 +827,10 @@ class TimeMachinesInstance extends InstanceBase {
 		}
 	}
 
-	startBlink(options) {
+	//`source` records who owns the current blink ('manual', 'autowarn', 'timesup') so that turning off
+	//Auto-Warn or Time's Up Blink mid-flash only stops a blink it started itself - not a manual blink,
+	//or the other automation's blink, that happens to be running at the same moment.
+	startBlink(options, source = 'manual') {
 		if (this.BLINK_INTERVAL) {
 			clearInterval(this.BLINK_INTERVAL)
 		}
@@ -797,6 +841,7 @@ class TimeMachinesInstance extends InstanceBase {
 		}
 
 		this.BLINK_MODE = options.mode
+		this.BLINK_SOURCE = source
 		this.BLINK_ON = true
 		this.applyBlinkPhase(options, true)
 		this.checkFeedbacks('blinkActive')
@@ -816,7 +861,13 @@ class TimeMachinesInstance extends InstanceBase {
 			this.BLINK_INTERVAL = null
 		}
 
+		if (this.BLINK_TIMEOUT) {
+			clearTimeout(this.BLINK_TIMEOUT)
+			this.BLINK_TIMEOUT = null
+		}
+
 		this.BLINK_ON = false
+		this.BLINK_SOURCE = null
 
 		if (this.BLINK_MODE === 'color') {
 			this.setDisplayColor(
@@ -833,8 +884,8 @@ class TimeMachinesInstance extends InstanceBase {
 		this.checkFeedbacks('blinkActive')
 	}
 
-	quickBlink(options) {
-		this.startBlink(options)
+	quickBlink(options, source = 'manual') {
+		this.startBlink(options, source)
 
 		let ownInterval = this.BLINK_INTERVAL
 		this.BLINK_TIMEOUT = setTimeout(() => {

@@ -1,4 +1,5 @@
 import { combineRgb } from '@companion-module/base'
+import { TOGGLE_OFF_PNG64 } from './toggle-icons.js'
 
 export function getPresets() {
 	let presets = {}
@@ -1006,24 +1007,26 @@ export function getPresets() {
 		feedbacks: [],
 	}
 
-	presets['enableAutoWarn'] = {
+	presets['toggleAutoWarn'] = {
 		type: 'button',
 		category: 'Presentation Automation',
-		name: 'Enable Auto-Warn (Red/Yellow Blink at 30s)',
+		name: 'Toggle Auto-Warn (Red/Yellow Blink at 30s)',
 		style: {
 			style: 'text',
-			text: 'Enable\\nAuto-Warn',
+			text: 'Auto-Warn',
 			size: '14',
 			color: ColorWhite,
 			bgcolor: ColorBlack,
+			png64: TOGGLE_OFF_PNG64,
+			pngalignment: 'center:top',
+			alignment: 'center:bottom',
 		},
 		steps: [
 			{
 				down: [
 					{
-						actionId: 'autoWarnConfig',
+						actionId: 'toggleAutoWarn',
 						options: {
-							enabled: true,
 							threshold: 30,
 							warnMethod: 'blink',
 							mode: 'brightness',
@@ -1038,54 +1041,34 @@ export function getPresets() {
 				up: [],
 			},
 		],
-		feedbacks: [],
-	}
-
-	presets['disableAutoWarn'] = {
-		type: 'button',
-		category: 'Presentation Automation',
-		name: 'Disable Auto-Warn',
-		style: {
-			style: 'text',
-			text: 'Disable\\nAuto-Warn',
-			size: '14',
-			color: ColorWhite,
-			bgcolor: ColorBlack,
-		},
-		steps: [
+		feedbacks: [
 			{
-				down: [
-					{
-						actionId: 'autoWarnConfig',
-						options: {
-							enabled: false,
-						},
-					},
-				],
-				up: [],
+				feedbackId: 'autoWarnEnabled',
+				options: {},
 			},
 		],
-		feedbacks: [],
 	}
 
-	presets['enableAutoCountUp'] = {
+	presets['toggleAutoCountUp'] = {
 		type: 'button',
 		category: 'Presentation Automation',
-		name: 'Enable Auto Count-Up After Countdown',
+		name: 'Toggle Auto Count-Up After Countdown',
 		style: {
 			style: 'text',
-			text: 'Enable\\nAuto Count-Up',
+			text: 'Auto Count-Up',
 			size: '14',
 			color: ColorWhite,
 			bgcolor: ColorBlack,
+			png64: TOGGLE_OFF_PNG64,
+			pngalignment: 'center:top',
+			alignment: 'center:bottom',
 		},
 		steps: [
 			{
 				down: [
 					{
-						actionId: 'autoCountUpConfig',
+						actionId: 'toggleAutoCountUp',
 						options: {
-							enabled: true,
 							mode: 'sec',
 						},
 					},
@@ -1093,54 +1076,34 @@ export function getPresets() {
 				up: [],
 			},
 		],
-		feedbacks: [],
-	}
-
-	presets['disableAutoCountUp'] = {
-		type: 'button',
-		category: 'Presentation Automation',
-		name: 'Disable Auto Count-Up After Countdown',
-		style: {
-			style: 'text',
-			text: 'Disable\\nAuto Count-Up',
-			size: '14',
-			color: ColorWhite,
-			bgcolor: ColorBlack,
-		},
-		steps: [
+		feedbacks: [
 			{
-				down: [
-					{
-						actionId: 'autoCountUpConfig',
-						options: {
-							enabled: false,
-						},
-					},
-				],
-				up: [],
+				feedbackId: 'autoCountUpEnabled',
+				options: {},
 			},
 		],
-		feedbacks: [],
 	}
 
-	presets['enableTimesUpBlink'] = {
+	presets['toggleTimesUpBlink'] = {
 		type: 'button',
 		category: 'Presentation Automation',
-		name: "Enable Time's Up Blink",
+		name: "Toggle Time's Up Blink",
 		style: {
 			style: 'text',
-			text: "Enable\\nTime's Up",
+			text: "Time's Up",
 			size: '14',
 			color: ColorWhite,
 			bgcolor: ColorBlack,
+			png64: TOGGLE_OFF_PNG64,
+			pngalignment: 'center:top',
+			alignment: 'center:bottom',
 		},
 		steps: [
 			{
 				down: [
 					{
-						actionId: 'timesUpBlinkConfig',
+						actionId: 'toggleTimesUpBlink',
 						options: {
-							enabled: true,
 							duration: 3000,
 							mode: 'brightness',
 							rate: 200,
@@ -1154,34 +1117,12 @@ export function getPresets() {
 				up: [],
 			},
 		],
-		feedbacks: [],
-	}
-
-	presets['disableTimesUpBlink'] = {
-		type: 'button',
-		category: 'Presentation Automation',
-		name: "Disable Time's Up Blink",
-		style: {
-			style: 'text',
-			text: "Disable\\nTime's Up",
-			size: '14',
-			color: ColorWhite,
-			bgcolor: ColorBlack,
-		},
-		steps: [
+		feedbacks: [
 			{
-				down: [
-					{
-						actionId: 'timesUpBlinkConfig',
-						options: {
-							enabled: false,
-						},
-					},
-				],
-				up: [],
+				feedbackId: 'timesUpBlinkEnabled',
+				options: {},
 			},
 		],
-		feedbacks: [],
 	}
 
 	return presets
